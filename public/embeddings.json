@@ -1,9 +1,48 @@
 [
   {
+    "id": "aisc-madrid",
+    "title": "AISC Madrid",
+    "tagline": "Co-founded Madrid's largest student-run AI community",
+    "description": "First AISC chapter in Europe, first AI student association at UC3M. Talks, workshops, hackathons, mentorship",
+    "tech": [
+      "Community",
+      "Leadership",
+      "Events",
+      "Mentorship",
+      "Ecosystem"
+    ],
+    "slug": "/projects/aisc-madrid",
+    "year": "2025",
+    "position": [
+      -0.28295348476424276,
+      0.4567795082250412,
+      1
+    ]
+  },
+  {
+    "id": "bearhack-posture",
+    "title": "BearHack — Bad Posture Detection",
+    "tagline": "3rd place at UC Riverside Hackathon, real-time posture monitoring with computer vision",
+    "description": "A real-time webcam-based posture monitoring system built in 24 hours at the UC Riverside hackathon",
+    "tech": [
+      "Python",
+      "OpenCV",
+      "Computer Vision",
+      "Hackathon"
+    ],
+    "slug": "/projects/bearhack-posture",
+    "year": "2024",
+    "position": [
+      1,
+      1,
+      -0.12013620186642904
+    ]
+  },
+  {
     "id": "spotter",
     "title": "Spotter",
     "tagline": "Camera-first nutritional tracking on iOS, powered by LiDAR and multimodal LLMs",
-    "description": "Consumer iOS app that turns the iPhone Pro LiDAR sensor and GPT-4o into a single-scan food coach. Swift, ARKit, Core ML on-device classification, server-side multimodal reasoning. Shipped on the App Store.",
+    "description": "Consumer iOS app that turns the iPhone Pro LiDAR sensor and GPT-4o into a single-scan food coach",
     "tech": [
       "Swift",
       "SwiftUI",
@@ -13,41 +52,18 @@
       "iOS"
     ],
     "slug": "/projects/spotter",
-    "year": 2025,
-    "domain": "consumer-mobile-ai",
+    "year": "2025",
     "position": [
-      -0.14614287018959238,
-      1,
-      0.28713107606066823
-    ]
-  },
-  {
-    "id": "tfg",
-    "title": "RGB-D Nutritional Pipeline (TFG)",
-    "tagline": "Research-grade portion estimation pipeline fusing LiDAR depth with multimodal reasoning",
-    "description": "Undergraduate thesis at UC3M. Advanced computer vision pipeline that fuses RGB-D scans from iPhone LiDAR with GPT-4o reasoning to estimate food volume and macros at research-grade accuracy. Uses the Spotter app as research interface.",
-    "tech": [
-      "Python",
-      "Computer Vision",
-      "ARKit",
-      "LiDAR",
-      "GPT-4o",
-      "Research"
-    ],
-    "slug": "/projects/tfg",
-    "year": 2026,
-    "domain": "computer-vision-research",
-    "position": [
-      -0.8527368510993818,
-      0.08341435374048056,
-      -1
+      0.6249179543804064,
+      -1,
+      -0.14952922120082068
     ]
   },
   {
     "id": "suntory-genai",
     "title": "Enterprise GenAI Assistant",
-    "tagline": "Production multi-LLM platform at Beam Suntory, sanitized case study",
-    "description": "Internal GenAI assistant at Beam Suntory. Retrieval over enterprise knowledge with multi-provider LLM routing, evaluation harness, and full observability. Sanitized: no product names, no real metrics, no real screenshots.",
+    "tagline": "Production multi-LLM platform at Beam Suntory — sanitized case study",
+    "description": "Internal GenAI assistant at a Fortune 500 beverages company, with retrieval over enterprise knowledge, multi-provider LLM routing, evaluation harness, and observability",
     "tech": [
       "Python",
       "FastAPI",
@@ -57,53 +73,32 @@
       "Azure"
     ],
     "slug": "/projects/suntory-genai",
-    "year": 2025,
-    "domain": "enterprise-genai",
+    "year": "2025",
     "position": [
-      1,
       -1,
-      -0.2570489002956955
+      -0.9307061564972321,
+      -1
     ]
   },
   {
-    "id": "aisc-madrid",
-    "title": "AISC Madrid",
-    "tagline": "Co-founded Madrid's largest student-run AI community",
-    "description": "Co-founder and Director of Events at AISC Madrid. First AISC chapter in Europe, first student AI association at UC3M. Talks, workshops, hackathons, mentorship. Bridge between academia and the Madrid AI hiring market.",
-    "tech": [
-      "Community",
-      "Leadership",
-      "Events",
-      "Mentorship",
-      "Ecosystem"
-    ],
-    "slug": "/projects/aisc-madrid",
-    "year": 2025,
-    "domain": "community-leadership",
-    "position": [
-      -1,
-      -0.8326242748042749,
-      0.30312329698581153
-    ]
-  },
-  {
-    "id": "bearhack-posture",
-    "title": "BearHack — Bad Posture Detection",
-    "tagline": "3rd place at UCR Hackathon, real-time posture monitoring with computer vision",
-    "description": "Hackathon project at UC Riverside. Computer vision pipeline detecting bad posture from webcam feeds in real time. 3rd place winner.",
+    "id": "tfg",
+    "title": "RGB-D Nutritional Pipeline (TFG)",
+    "tagline": "Research-grade portion estimation fusing iPhone LiDAR with multimodal reasoning",
+    "description": "Undergraduate thesis at UC3M, an advanced RGB-D pipeline for nutritional tracking that uses the Spotter app as research interface",
     "tech": [
       "Python",
-      "OpenCV",
+      "ARKit",
+      "LiDAR",
+      "GPT-4o",
       "Computer Vision",
-      "Hackathon"
+      "Research"
     ],
-    "slug": "/projects/bearhack-posture",
-    "year": 2024,
-    "domain": "computer-vision-research",
+    "slug": "/projects/tfg",
+    "year": "2026",
     "position": [
-      0.695003551616961,
-      -0.1479211536483972,
-      1
+      -0.7926668867118762,
+      0.9027148686388975,
+      -0.6538386713879378
     ]
   }
 ]

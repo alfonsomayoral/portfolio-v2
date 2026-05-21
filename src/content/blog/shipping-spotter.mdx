@@ -1,0 +1,78 @@
+---
+title: What I learned shipping an iOS app in college
+description: Spotter is on the App Store. Here is what surprised me about LiDAR, multimodal LLMs, and shipping consumer software as a solo founder while studying telecoms.
+pub_date: 2026-05-15
+tags: [iOS, LLMs, computer-vision, founding]
+reading_time: 7
+draft: true
+---
+
+> TL;DR — LiDAR makes consumer 3D vision practical in ways nobody is
+> using yet. Multimodal LLMs are unreasonably good at the long tail of
+> visual recognition, but they will eat your margin if you do not gate
+> them. Shipping a real iOS app is 30% engineering and 70% the parts
+> nobody writes blog posts about.
+
+## Why Spotter exists
+
+Every nutrition app on the App Store fails at the same thing: friction.
+Logging a meal takes too long, the database is incomplete, and the
+results are barely better than guessing. Adherence dies within weeks.
+Mine did, twice.
+
+In parallel, every iPhone Pro since 2020 ships with a LiDAR sensor that
+almost nobody uses. The geometric information needed to estimate portion
+volume from a photo has been sitting in everyone&apos;s pocket for years. I
+wanted to know if the consumer UX could finally catch up to the hardware.
+
+[Spotter](/projects/spotter) is the answer I built. Point the camera at
+a plate, get back macros in under three seconds. No typing, no searching,
+no barcode scanning.
+
+## The architecture is the product
+
+The interesting decision is the division of labor between
+**on-device classification**, **LiDAR-derived volume**, and the
+**multimodal LLM**.
+
+[REQUIRES INPUT: tighten this section with the exact split — what
+percentage of scans never call the LLM because Core ML is confident
+enough, what the median end-to-end latency is, anything specific about
+where the model gets it wrong.]
+
+The architectural insight: the LLM doesn&apos;t need to estimate volume.
+LiDAR already did. The LLM only has to reason about food identity and
+the macronutrient profile of a known portion. This narrows the failure
+surface dramatically.
+
+## What I underestimated
+
+**The App Store submission process.** [REQUIRES INPUT: how many
+submission rejections did you get, and what was the most painful one?]
+
+**StoreKit, RevenueCat, paywall UX.** Building the camera flow took
+weeks; building a paywall that converts took almost as long. Pricing,
+trial design, copy, screenshots — every one of them affects revenue more
+than the camera model does.
+
+**Cost per scan.** GPT-4o is not free. On day one, every scan called the
+model. The first month&apos;s bill made me build the Core ML gating layer
+that should have been there from the start. [REQUIRES INPUT: rough cost
+per scan now vs. day-one.]
+
+## What I&apos;d do differently
+
+[REQUIRES INPUT: one honest reflection. Examples that work: spent
+N weeks on a feature users never used; chose a backend stack I couldn&apos;t
+self-host cheaply; shipped without analytics and was flying blind for
+weeks.]
+
+## For other student builders
+
+The most common failure mode I see in student projects is treating
+shipping as a final step. It is the only step that matters.
+Everything before it is just preparation. Pick a small enough scope that
+you can ship, then ship, then expand.
+
+If you&apos;re reading this and you have a project you&apos;ve been &quot;almost ready
+to launch&quot; for more than three months: launch the worse version.

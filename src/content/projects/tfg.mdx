@@ -1,0 +1,72 @@
+---
+title: RGB-D Nutritional Pipeline (TFG)
+tagline: Research-grade portion estimation fusing iPhone LiDAR with multimodal reasoning
+description: Undergraduate thesis at UC3M, an advanced RGB-D pipeline for nutritional tracking that uses the Spotter app as research interface
+tech_stack: [Python, ARKit, LiDAR, GPT-4o, Computer Vision, Research]
+role: Author
+year: 2026
+status: research
+featured: false
+order: 4
+---
+
+## Overview
+
+My undergraduate thesis at Universidad Carlos III de Madrid. Where
+[Spotter](/projects/spotter) is the consumer product, the TFG is the
+research artifact behind a more advanced portion-estimation pipeline,
+using the Spotter iOS app as the data-capture and evaluation interface.
+
+The goal: take the consumer-grade single-scan flow and push portion-volume
+accuracy closer to research-grade, with explicit error bars per scan and
+a reproducible evaluation harness.
+
+## Research questions
+
+1. How much portion-volume accuracy can a single iPhone LiDAR scan
+   deliver, vs. lab-grade depth setups?
+2. What's the right division of labor between geometric estimation
+   (from depth) and semantic reasoning (from multimodal LLMs)?
+3. Can the system produce calibrated confidence intervals, not just point
+   estimates?
+
+## Method
+
+- Data capture: Spotter app extended with research-mode flags to log raw
+  LiDAR depth, RGB frames, and timestamps
+- Ground-truth dataset: [REQUIRES INPUT: how did you build it — N meals
+  weighed on a calibrated scale + photographed? A public dataset? A mix?]
+- Pipeline: depth-conditioned segmentation + volume estimation, then
+  GPT-4o for identity + per-100g macros lookup
+- Evaluation: per-class portion error, end-to-end macro MAE, calibration
+  curves
+
+## Tech stack
+
+- iPhone Pro (LiDAR-capable) as the capture device
+- Spotter app (Swift + ARKit) as the research front-end
+- Python + [REQUIRES INPUT: PyTorch / OpenCV / Open3D — which libraries]
+  for the offline analysis pipeline
+- OpenAI GPT-4o for the semantic step
+- [REQUIRES INPUT: any framework you used for reproducibility — wandb,
+  hydra, dvc, plain make]
+
+## Key results
+
+[REQUIRES INPUT: 2-3 quantitative findings — e.g., "Mean portion-volume
+error reduced from X% to Y% vs. baseline", "Calibration improved from
+overconfident to nearly-calibrated across N food classes", "Pipeline
+runs at N seconds end-to-end on a modern laptop". Be specific where
+possible; if results are not yet final, say so and frame as in-progress.]
+
+## What I&apos;d do differently
+
+[REQUIRES INPUT: one honest reflection on the research process — what
+you'd scope differently, what you under/over-invested in, what surprised
+you.]
+
+## Links
+
+- Thesis memoria (PDF): [REQUIRES INPUT: link to the PDF when defended]
+- Related consumer product: [Spotter](/projects/spotter)
+- Defense slides: [REQUIRES INPUT: link or "available on request"]

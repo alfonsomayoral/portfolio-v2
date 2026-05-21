@@ -1,0 +1,112 @@
+---
+title: Spotter
+tagline: Camera-first nutritional tracking on iOS, powered by LiDAR and multimodal LLMs
+description: Consumer iOS app that turns the iPhone Pro LiDAR sensor and GPT-4o into a single-scan food coach
+tech_stack: [Swift, SwiftUI, ARKit, Core ML, GPT-4o, iOS]
+role: Founder & sole engineer
+year: 2025
+status: shipped
+featured: true
+order: 1
+---
+
+## Overview
+
+Manual food logging is the dominant failure mode of nutrition apps —
+friction kills adherence within weeks. Existing computer-vision approaches
+guess portions from 2D photos and fail on volume estimation. Since 2020,
+every iPhone Pro ships with a LiDAR sensor that nobody had productized for
+consumer nutrition.
+
+Spotter is the app I wished existed: point your iPhone at a plate, get
+back portion-accurate macros without typing, searching, or scanning
+barcodes. The scan flow takes under three seconds.
+
+This case study covers the consumer product. The underlying portion-volume
+research is documented separately in my
+[undergraduate thesis case study](/projects/tfg).
+
+## My role
+
+Solo founder and engineer. I shipped every part of the product:
+
+- Designed the RGB-D scan pipeline that fuses LiDAR depth with multimodal
+  LLM reasoning
+- Built the on-device classification stack in Core ML so the camera flow
+  stays responsive offline up to the cloud reasoning step
+- Shipped the full iOS surface area: onboarding, scan flow, history,
+  paywall, profile
+- Built the backend that aggregates scan metadata and calls GPT-4o
+- Owned design, product decisions, and the App Store submission process
+
+## Tech stack
+
+- **iOS**: Swift, SwiftUI, ARKit (LiDAR depth + scene reconstruction),
+  Core ML, Vision
+- **Backend**: [REQUIRES INPUT: backend stack — e.g., FastAPI + Postgres,
+  Firebase, Supabase]
+- **AI**: OpenAI GPT-4o (multimodal reasoning), Core ML on-device food
+  classifier
+- **Payments**: [REQUIRES INPUT: RevenueCat / StoreKit / none yet]
+- **Analytics**: [REQUIRES INPUT: PostHog / Mixpanel / none yet]
+
+## Architecture
+
+```
+iPhone camera + LiDAR
+  └─> ARKit depth + frame capture
+       └─> Core ML food classifier (on-device, <100ms)
+            └─> Backend aggregates scan metadata
+                 └─> GPT-4o multimodal call
+                      (image + class hypothesis + LiDAR-derived volume)
+                       └─> Structured macros returned
+                            └─> Local persistence + history view
+```
+
+The key insight: the LLM doesn't have to estimate volume — LiDAR already
+did. The LLM only has to reason about food identity and the
+macronutrient profile of a known portion. This narrows the failure surface
+and produces a much more reliable output than a vision-only pipeline.
+
+## Key decisions
+
+### On-device classification before the LLM call
+
+I considered sending raw frames straight to GPT-4o, but ran the math on
+latency and cost. A Core ML classifier identifies likely candidates in
+under 100ms locally, and the LLM only has to validate and refine. This
+keeps the scan UI snappy and cuts API costs by routing obvious cases
+without a full reasoning call.
+
+### LiDAR depth as the volume signal, not photogrammetry
+
+Photogrammetry requires multi-angle capture, which is a UX killer. LiDAR
+gives metric depth from a single frame. The portion-estimate quality
+ceiling is lower than a Kinect-style 3D scan, but the floor is high
+enough for the actual use case (a casual user logging a meal in seconds),
+and the UX is uncompromised.
+
+### GPT-4o over a fine-tuned vision model
+
+A fine-tuned vision model is a longer path with worse generalization out
+of the gate. GPT-4o handles long-tail foods (mixed dishes, regional foods,
+homemade meals) without per-food training data. The tradeoff is per-scan
+cost; the mitigation is the on-device classifier filtering trivial cases.
+
+## Metrics
+
+[REQUIRES INPUT: any of — total downloads, MAU, retention day-7/day-30,
+App Store rating + review count, average scans per user. Pick what you're
+willing to share, omit the rest.]
+
+## What I&apos;d do differently
+
+[REQUIRES INPUT: one honest reflection — e.g., scope mistakes, a feature
+you built and users didn't use, a tech choice you'd reverse, an
+underestimated cost. One paragraph, no hedging.]
+
+## Links
+
+- App Store: [REQUIRES INPUT: paste URL]
+- Showcase repo: [github.com/alfonsomayoral/spotter-showcase](https://github.com/alfonsomayoral/spotter-showcase) (Phase 4)
+- Related: [the underlying RGB-D research (TFG)](/projects/tfg)

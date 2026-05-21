@@ -1,0 +1,218 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Tag from '@/components/Tag.astro';
+
+const values = [
+  {
+    title: 'Craft',
+    body: 'Ship things that work, not things that demo. The iOS app, the eval harness, the community — none of them are perfect, but all of them exist in production and used by real people. The bar is "does it hold up under real conditions", not "does it look good in a deck".',
+  },
+  {
+    title: 'Service',
+    body: 'Tech is leverage; communities are compounding. AISC Madrid exists because the AI ecosystem in Spain is worth contributing to before I (probably) leave it. The best engineers I know are the ones whose teams are visibly stronger for them having been there.',
+  },
+  {
+    title: 'Courage',
+    body: 'Shipping a consumer app as a solo founder while in college, co-founding a community from zero, applying to a US fellowship from Madrid with one year of experience — none of these are obvious moves. The interesting career is the one where you keep choosing the move that scares you.',
+  },
+];
+
+const experience = [
+  {
+    role: 'AI Engineer',
+    org: 'Beam Suntory',
+    period: 'Sep 2025 — Present',
+    body: 'Production GenAI work for an internal multi-LLM platform. Retrieval, routing, evaluation, observability. See the sanitized case study under Projects.',
+  },
+  {
+    role: 'Co-founder & Director of Events',
+    org: 'AISC Madrid',
+    period: 'Jul 2025 — Present',
+    body: 'First AISC chapter in Europe, first AI student association at UC3M. Own the event pipeline, partner relationships, and community ops.',
+  },
+  {
+    role: 'Competitive Projects Team',
+    org: 'AISC Riverside',
+    period: 'Sep 2024 — Jun 2025',
+    body: 'During my exchange at UC Riverside. Workshops on AI/ML/NLP/CV. Built real-time video-call interview sentiment analysis with the competitive team.',
+  },
+  {
+    role: 'Talentum Scholar',
+    org: 'Telefónica Business Solutions',
+    period: 'Jun 2022 — Aug 2022',
+    body: 'Summer software engineering internship across Telefónica Group companies. 10+ professional lectures, 2 case studies, 8+ team-building workshops on data, AI, and software development.',
+  },
+];
+
+const education = [
+  {
+    institution: 'Universidad Carlos III de Madrid',
+    degree: 'BSc Telecommunications Technology Engineering',
+    period: 'Sep 2021 — Jun 2026',
+    detail: 'GPA 8.7/10, top 10 of cohort. Thesis on RGB-D nutritional pipeline with iPhone LiDAR + GPT-4o.',
+  },
+  {
+    institution: 'University of California, Riverside',
+    degree: 'Exchange Year — CS, EE, Business',
+    period: 'Sep 2024 — Jun 2025',
+    detail: 'GPA 4.0/4.0. Chancellor\'s Honor List. Coursework in NLP, Cryptography, ML & Data Mining, Computer Vision, AI.',
+  },
+];
+
+const stack = [
+  'Python', 'TypeScript', 'Swift', 'LLMs', 'RAG', 'Agents',
+  'LangChain', 'FastAPI', 'iOS / SwiftUI', 'ARKit', 'Core ML',
+  'PyTorch', 'Transformers', 'OpenCV',
+];
+---
+
+<BaseLayout
+  title="About — Alfonso Mayoral"
+  description="AI engineer based in Madrid. Beam Suntory by day, Spotter and AISC by night. Applying to the Exponential Fellowship for Fall 2026."
+>
+  <section class="max-w-[var(--container-narrow)] mx-auto px-6 pt-32 pb-12">
+    <p class="font-mono text-sm text-[var(--color-accent-hover)] mb-4">About</p>
+    <h1 class="text-4xl md:text-6xl font-semibold tracking-tight text-[var(--color-text-primary)] mb-6">
+      Alfonso Mayoral
+    </h1>
+    <p class="text-lg text-[var(--color-text-secondary)] leading-relaxed">
+      AI engineer based in Madrid. Final-year Telecom Engineering at UC3M.
+      One year into production GenAI at Beam Suntory. Shipped a consumer
+      iOS app on the App Store. Co-founded Madrid&apos;s largest student-run AI
+      community.
+    </p>
+  </section>
+
+  <section class="max-w-[var(--container-narrow)] mx-auto px-6 py-12">
+    <h2 class="text-xs font-mono text-[var(--color-text-muted)] uppercase tracking-wider mb-4">
+      Now
+    </h2>
+    <div class="space-y-4 text-[var(--color-text-secondary)] leading-relaxed">
+      <p>
+        Currently AI engineer at Beam Suntory in Madrid, where I build
+        production GenAI tooling used internally. In parallel I keep
+        Spotter running on the App Store and run the events program at
+        AISC Madrid through its second year.
+      </p>
+      <p>
+        I&apos;m applying to the <strong class="text-[var(--color-text-primary)]">Exponential Fellowship</strong> for
+        Fall 2026 and looking hard at US graduate programs (Berkeley
+        Haas + EECS MEng is on the list). My medium-term plan is to be
+        building in the Bay Area within 18-24 months — as a founder if
+        the right problem and team show up, as an early engineer at the
+        right startup otherwise.
+      </p>
+    </div>
+  </section>
+
+  <section class="max-w-[var(--container-narrow)] mx-auto px-6 py-12">
+    <h2 class="text-xs font-mono text-[var(--color-text-muted)] uppercase tracking-wider mb-4">
+      What I&apos;m looking for
+    </h2>
+    <p class="text-[var(--color-text-secondary)] leading-relaxed">
+      Early-stage AI startups where engineering and product decisions sit
+      in the same room — companies where shipping is the default, the team
+      is small enough that I can own surfaces, and the mission is to make
+      a real product work, not to publish a demo. I read the Exponential
+      Fellowship directory cover-to-cover; if you&apos;re on that list or look
+      like the companies on it, I want to talk.
+    </p>
+  </section>
+
+  <section class="max-w-[var(--container-narrow)] mx-auto px-6 py-12">
+    <h2 class="text-xs font-mono text-[var(--color-text-muted)] uppercase tracking-wider mb-4">
+      Values
+    </h2>
+    <div class="space-y-6">
+      {values.map((v) => (
+        <div class="p-5 border border-[var(--color-border)] rounded-md bg-[var(--color-bg-elevated)]">
+          <h3 class="text-base font-semibold text-[var(--color-text-primary)] mb-2">{v.title}</h3>
+          <p class="text-sm text-[var(--color-text-secondary)] leading-relaxed">{v.body}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="max-w-[var(--container-narrow)] mx-auto px-6 py-12">
+    <h2 class="text-xs font-mono text-[var(--color-text-muted)] uppercase tracking-wider mb-4">
+      Experience
+    </h2>
+    <ol class="space-y-6">
+      {experience.map((e) => (
+        <li class="border-l border-[var(--color-border)] pl-5">
+          <div class="flex flex-wrap items-baseline justify-between gap-x-4">
+            <p class="text-[var(--color-text-primary)] font-medium">
+              {e.role}, <span class="text-[var(--color-text-secondary)]">{e.org}</span>
+            </p>
+            <p class="font-mono text-xs text-[var(--color-text-muted)]">{e.period}</p>
+          </div>
+          <p class="text-sm text-[var(--color-text-secondary)] mt-1 leading-relaxed">{e.body}</p>
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  <section class="max-w-[var(--container-narrow)] mx-auto px-6 py-12">
+    <h2 class="text-xs font-mono text-[var(--color-text-muted)] uppercase tracking-wider mb-4">
+      Education
+    </h2>
+    <ol class="space-y-6">
+      {education.map((e) => (
+        <li class="border-l border-[var(--color-border)] pl-5">
+          <div class="flex flex-wrap items-baseline justify-between gap-x-4">
+            <p class="text-[var(--color-text-primary)] font-medium">{e.institution}</p>
+            <p class="font-mono text-xs text-[var(--color-text-muted)]">{e.period}</p>
+          </div>
+          <p class="text-sm text-[var(--color-text-secondary)] mt-1">{e.degree}</p>
+          <p class="text-sm text-[var(--color-text-secondary)] mt-1 leading-relaxed">{e.detail}</p>
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  <section class="max-w-[var(--container-narrow)] mx-auto px-6 py-12">
+    <h2 class="text-xs font-mono text-[var(--color-text-muted)] uppercase tracking-wider mb-4">
+      Stack
+    </h2>
+    <div class="flex flex-wrap gap-2">
+      {stack.map((s) => <Tag label={s} />)}
+    </div>
+  </section>
+
+  <section class="max-w-[var(--container-narrow)] mx-auto px-6 py-12">
+    <h2 class="text-xs font-mono text-[var(--color-text-muted)] uppercase tracking-wider mb-4">
+      Languages
+    </h2>
+    <ul class="space-y-2 text-[var(--color-text-secondary)]">
+      <li><strong class="text-[var(--color-text-primary)]">Spanish</strong> — Native</li>
+      <li><strong class="text-[var(--color-text-primary)]">English</strong> — Proficient (TOEFL 84)</li>
+    </ul>
+  </section>
+
+  <section class="max-w-[var(--container-narrow)] mx-auto px-6 py-12">
+    <h2 class="text-xs font-mono text-[var(--color-text-muted)] uppercase tracking-wider mb-4">
+      Outside of work
+    </h2>
+    <p class="text-[var(--color-text-secondary)] leading-relaxed">
+      [REQUIRES INPUT: 2-3 sentences. Running, climbing, reading, music,
+      whatever. Specific beats generic — &quot;I read paper-of-the-week out
+      loud to AISC members every Tuesday&quot; beats &quot;I love learning&quot;.]
+    </p>
+  </section>
+
+  <section id="contact" class="max-w-[var(--container-narrow)] mx-auto px-6 py-16 mb-16 border-t border-[var(--color-border)]">
+    <h2 class="text-xs font-mono text-[var(--color-text-muted)] uppercase tracking-wider mb-4">
+      Contact
+    </h2>
+    <p class="text-[var(--color-text-secondary)] mb-4">
+      Email is the best way to reach me. I read everything that isn&apos;t
+      automated.
+    </p>
+    <a
+      href="mailto:alfonsomayoral29@gmail.com"
+      class="inline-flex items-center font-mono text-[var(--color-accent-hover)] hover:underline"
+    >
+      alfonsomayoral29@gmail.com
+    </a>
+  </section>
+</BaseLayout>

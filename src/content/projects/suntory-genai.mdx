@@ -1,0 +1,110 @@
+---
+title: Enterprise GenAI Assistant
+tagline: Production multi-LLM platform at Beam Suntory — sanitized case study
+description: Internal GenAI assistant at a Fortune 500 beverages company, with retrieval over enterprise knowledge, multi-provider LLM routing, evaluation harness, and observability
+tech_stack: [Python, FastAPI, LangChain, RAG, LLMs, Azure]
+role: AI Engineer
+year: 2025
+status: shipped
+featured: true
+order: 2
+nda: true
+---
+
+## Overview
+
+Built and shipped at **Beam Suntory** (a global beverages company),
+where I've been AI Engineer since September 2025. The product is an
+internal GenAI assistant for employees, sitting on top of enterprise
+knowledge sources with multi-provider LLM routing, an evaluation harness,
+and full request observability.
+
+Specifics about the internal tool are sanitized — see the disclaimer at
+the bottom. This case study covers architectural patterns and the
+engineering work I owned, not the product itself.
+
+## Problem framing
+
+Large beverages companies sit on years of internal documentation,
+dashboards, and process knowledge fragmented across many systems.
+Employees waste hours per week locating answers that already exist. The
+mandate I was given: build a conversational interface over this corpus
+that meets enterprise standards for security, latency, observability, and
+cost.
+
+## My role
+
+- Designed and implemented the retrieval pipeline: chunking strategy,
+  indexing, hybrid (dense + sparse) search, reranking
+- Built the multi-LLM routing layer: the same query can fall back across
+  providers when one fails, hits quota, or violates latency budgets
+- Owned the evaluation harness — golden dataset and automated regression
+  tests across model upgrades, so we never silently regress when we swap
+  providers or models
+- Implemented full request observability: per-request trace of prompts,
+  retrievals, model calls, latency, and token cost
+- Led prompt engineering across [REQUIRES INPUT: N] distinct use cases,
+  codified into reusable templates with versioning
+- [REQUIRES INPUT: optional — cross-functional ownership: did you also
+  own product, stakeholders, rollout, mentoring?]
+
+## Architecture
+
+Standard RAG-with-routing topology, generic enough to share:
+
+```
+User query
+  └─> Auth layer (SSO)
+       └─> Query router (intent classification → specialized pipeline)
+            └─> Retrieval (embedding search + keyword fallback + rerank)
+                 └─> Context assembly with citation metadata
+                      └─> LLM call (with provider failover)
+                           └─> Post-processing (citation injection,
+                               PII scrub, response validation)
+                                └─> Observability sink + response
+```
+
+## Key decisions
+
+### RAG over fine-tuning
+
+Domain knowledge changes weekly — fine-tuning would have meant rebuilding
+the model on every refresh. Retrieval keeps the model frozen and the index
+mutable, which is the right axis to vary for a knowledge product. The
+tradeoff is more compute per query and a more complex retrieval pipeline,
+which we paid for with the observability investment.
+
+### Multi-LLM routing from day one
+
+Most prototypes start with one provider. We didn't, because:
+- **Failover**: provider outages are inevitable; degrading to a backup is
+  better than going dark
+- **Cost shaping**: simple queries route to a cheaper tier, complex ones
+  to a stronger model
+- **Regulatory optionality**: different providers have different data
+  residency stories; the routing layer is where that conversation
+  happens
+
+### Evaluation harness before optimization
+
+We built a golden-dataset eval harness before we touched retrieval
+parameters. Without it, every "improvement" was someone's vibe. With it,
+the loop became: change one thing → measure on the harness → keep or
+revert. This is the single most leveraged piece of infrastructure on the
+project.
+
+## Metrics
+
+[REQUIRES INPUT: relative metrics only, your choice on what to share.
+Examples: "Reduced [generic task] from N hours to N minutes",
+"Cost per query reduced by X% after [optimization]",
+"Eval accuracy improved from X to Y on internal golden set".
+If everything is hard-NDA, one strong qualitative sentence works.]
+
+## What I&apos;d do differently
+
+[REQUIRES INPUT: one honest reflection. Suggested angles: started with
+a framework when a thin custom orchestrator would have been easier to
+debug; chose a vector DB based on hype rather than fit; under-invested
+in observability early; over-invested in prompt engineering before
+evaluation existed.]

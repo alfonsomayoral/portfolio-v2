@@ -1,0 +1,101 @@
+---
+title: Notes from one year as an AI engineer at a non-tech company
+description: One year shipping production GenAI at a Fortune 500 beverages company. What surprised me about enterprise AI, what nobody warns you about, and why a non-tech first job might be the best one for an AI engineer.
+pub_date: 2026-05-01
+tags: [enterprise, GenAI, career]
+reading_time: 8
+draft: true
+---
+
+> TL;DR — Enterprise AI is mostly distribution and trust, not modeling.
+> A non-tech company is the most underrated first job for an AI engineer:
+> you ship for users who don&apos;t care about your craft, which is
+> exactly the right calibration. Multi-LLM routing should be a default,
+> not an optimization.
+
+## What this is and isn&apos;t
+
+Sanitized writeup of one year at a global beverages company, building
+internal GenAI tooling. No company-specific product details, no real
+metrics, no customer names. The patterns are publicly shareable; the
+specifics are not.
+
+## What surprised me
+
+**The hard part is distribution, not modeling.** I came in expecting to
+optimize retrieval and fine-tune embeddings. The bottleneck turned out
+to be: how do you put a chat interface in front of an employee who has
+never used ChatGPT, in a workflow they already do every day, in under
+12 clicks, with an answer they trust enough to act on?
+
+The model is a commodity. The thing that&apos;s rare is the work that turns
+a competent model into a tool a non-technical user reaches for instead
+of asking a colleague.
+
+**Citations matter more than accuracy.** A 95%-accurate answer with no
+sources gets less adoption than an 85%-accurate answer with one
+clickable source. Trust scales with provenance, not with eval scores.
+
+**Latency under 3 seconds, or nothing.** I underestimated this. Above
+3 seconds, users assume it&apos;s broken. They open a new tab and never
+come back. The retrieval pipeline must hit the budget; nothing else
+matters until it does.
+
+## What I&apos;d build different next time
+
+**Evaluation harness on day one.** We built ours about three months in.
+Before that, every &quot;improvement&quot; was a vibe. Once the harness existed,
+the iteration loop became measurable: change → score → keep or revert.
+This is the single most leveraged piece of infrastructure on any GenAI
+project. Build it first.
+
+**Multi-LLM routing as a default, not an optimization.** Provider
+outages happen, prices change, capabilities evolve. The routing layer
+is where these conversations get to happen. Building it later means
+retrofitting an architecture; building it from the start means you can
+upgrade calmly.
+
+**Less framework, more code.** I started with [REQUIRES INPUT: framework
+you used — LangChain / LlamaIndex / etc.] for orchestration. Six months
+later I would have shipped faster, debugged faster, and shipped more
+maintainable code with a 200-line custom orchestrator. Frameworks are
+great for prototypes and bad for the system you have to operate for
+years.
+
+## Why this might be the best first job for an AI engineer
+
+The advice from US Twitter is to join a YC-backed AI startup as a
+founding engineer. That&apos;s great advice when it&apos;s available. It is not
+the only good path.
+
+A non-tech company gives you:
+
+- **Real users who don&apos;t care about your craft.** They will not give you
+  credit for elegant retrieval. They will use whatever ships and works
+  and stop using whatever doesn&apos;t. This is exactly the right calibration.
+- **A long horizon.** Startups optimize for a six-month story. Enterprise
+  AI work optimizes for a system you&apos;ll operate for years. Both are
+  valuable; you can&apos;t learn the second one in the first context.
+- **Adjacent disciplines.** I&apos;ve had to learn security review, data
+  governance, change management, internal comms. None of these would
+  have come up in a YC startup of seven engineers. All of them will
+  matter in any team I&apos;m on later.
+
+The cost is: you ship less of the cool stuff, you have less visibility
+in the open AI community, and you have to fight harder for the
+ambitious work. Trade-off, not strict downgrade.
+
+## What this year cost me, honestly
+
+[REQUIRES INPUT: an honest one-paragraph reflection. The trade-offs of
+working at a non-tech company, the side projects you sacrificed, the
+parts of AI engineering you don&apos;t get to touch. Honest writing here
+makes the whole post credible.]
+
+## What&apos;s next
+
+I&apos;m applying to the [Exponential Fellowship](https://exponential.com)
+for Fall 2026 with a clear thesis: the next chapter is building in the
+Bay Area, ideally at an early-stage AI startup where the patterns I&apos;ve
+learned at scale can be applied to a much smaller team shipping a real
+product. Reach out if you&apos;re building one of those.

@@ -72,11 +72,33 @@ Old portfolio at `../portfolio` is a Jekyll-rendered README using
 
 ---
 
-## Phase 3 — Content + design (PENDING)
+## Phase 3 — Content + design (DONE 2026-05-21, content placeholders pending)
 
-Landing sections, projects index, case study template, About page,
-3 blog drafts. Content questions tracked in
-`../portfolio-v2-prep/01-project-descriptions.md`.
+- Landing page with: hero, embedding visualizer, featured projects,
+  about preview, latest writing, CTA
+- `/projects` index with grid of all 5 projects, sorted by `order`
+- `/projects/[slug]` case study template via `ProjectLayout.astro`
+  - Hero header, tech tags, meta row, link buttons
+  - MDX body wrapped in Prose styles
+  - NDA disclaimer auto-renders if `nda: true` in frontmatter
+  - Related projects at bottom
+- 5 project MDX files: Spotter, TFG, Suntory GenAI (NDA), AISC Madrid,
+  BearHack Posture
+- `/about` page with: bio, Now, Looking-for, Values (craft/service/courage),
+  Experience timeline (4 entries — full work history per locked
+  decisions), Education, Stack, Languages, Contact
+- `/blog` index + `/blog/[slug]` posts via `BlogLayout.astro`
+- 3 blog drafts (`draft: true`, hidden in production builds):
+  - `shipping-spotter` — what I learned shipping an iOS app
+  - `building-aisc` — building an AI student community from zero
+  - `first-year-as-ai-engineer` — sanitized notes from Suntory year
+- All `[REQUIRES INPUT: ...]` placeholders compiled into
+  `CONTENT_QUESTIONS.md` at project root
+
+### Verified
+- [x] `npm run build` succeeds, 12 pages generated
+- [ ] In-browser visual check (manual via Vercel preview or `npm run dev`)
+- [ ] User fills `CONTENT_QUESTIONS.md`
 
 ---
 

@@ -1,0 +1,43 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import ProjectCard from '@/components/ProjectCard.astro';
+import { getCollection } from 'astro:content';
+
+const projects = (await getCollection('projects')).sort(
+  (a, b) => a.data.order - b.data.order
+);
+---
+
+<BaseLayout
+  title="Projects — Alfonso Mayoral"
+  description="Selected projects across consumer iOS, enterprise GenAI, computer vision research, and community."
+>
+  <section class="max-w-[var(--container-content)] mx-auto px-6 pt-32 pb-12">
+    <p class="font-mono text-sm text-[var(--color-accent-hover)] mb-4">Projects</p>
+    <h1 class="text-4xl md:text-6xl font-semibold tracking-tight text-[var(--color-text-primary)] mb-4">
+      Things I&apos;ve shipped
+    </h1>
+    <p class="text-lg text-[var(--color-text-secondary)] max-w-2xl leading-relaxed">
+      Consumer iOS, production GenAI at a Fortune 500, research, and the AI
+      community I co-founded in Madrid. Each entry is real work I led or built.
+    </p>
+  </section>
+
+  <section class="max-w-[var(--container-content)] mx-auto px-6 pb-32">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {
+        projects.map((p) => (
+          <ProjectCard
+            title={p.data.title}
+            tagline={p.data.tagline}
+            tech={p.data.tech_stack}
+            year={p.data.year}
+            status={p.data.status}
+            href={`/projects/${p.id}`}
+            image={p.data.hero_image}
+          />
+        ))
+      }
+    </div>
+  </section>
+</BaseLayout>
