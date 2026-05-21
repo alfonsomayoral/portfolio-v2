@@ -1,9 +1,9 @@
 ---
-title: Enterprise GenAI Assistant
-tagline: Production multi-LLM platform at Beam Suntory — sanitized case study
-description: Internal GenAI assistant at a Fortune 500 beverages company, with retrieval over enterprise knowledge, multi-provider LLM routing, evaluation harness, and observability
-tech_stack: [Python, FastAPI, LangChain, RAG, LLMs, Azure]
-role: AI Engineer
+title: Enterprise GenAI at Beam Suntory
+tagline: Production AI engineering inside the AI software team at a Fortune 500 — agents, MCPs, and enterprise Azure architectures
+description: One year as an AI Engineer at Beam Suntory, building end-to-end GenAI solutions across departments. Sanitized case study — patterns and engineering, not product internals.
+tech_stack: [Python, LangChain, OpenAI Agents SDK, Azure AI Foundry, Azure AI Search, MCP]
+role: AI Engineer (AI Software team)
 year: 2025
 status: shipped
 featured: true
@@ -13,98 +13,113 @@ nda: true
 
 ## Overview
 
-Built and shipped at **Beam Suntory** (a global beverages company),
-where I've been AI Engineer since September 2025. The product is an
-internal GenAI assistant for employees, sitting on top of enterprise
-knowledge sources with multi-provider LLM routing, an evaluation harness,
-and full request observability.
+I joined **Beam Suntory** in September 2025 as an AI Engineer inside
+the AI software team. My role spans the full lifecycle of enterprise
+GenAI solutions: spotting business use cases worth building, designing
+the architecture, implementing the end-to-end system on Azure with
+security controls appropriate for an enterprise environment, and
+iterating with stakeholders until the solution becomes part of a
+team&apos;s daily workflow.
 
-Specifics about the internal tool are sanitized — see the disclaimer at
-the bottom. This case study covers architectural patterns and the
-engineering work I owned, not the product itself.
-
-## Problem framing
-
-Large beverages companies sit on years of internal documentation,
-dashboards, and process knowledge fragmented across many systems.
-Employees waste hours per week locating answers that already exist. The
-mandate I was given: build a conversational interface over this corpus
-that meets enterprise standards for security, latency, observability, and
-cost.
+This case study describes the engineering patterns and the role. It
+does not name the products, departments, customers, or absolute
+metrics — that information is covered by the NDA. The architectural
+choices and lessons are publicly shareable.
 
 ## My role
 
-- Designed and implemented the retrieval pipeline: chunking strategy,
-  indexing, hybrid (dense + sparse) search, reranking
-- Built the multi-LLM routing layer: the same query can fall back across
-  providers when one fails, hits quota, or violates latency budgets
-- Owned the evaluation harness — golden dataset and automated regression
-  tests across model upgrades, so we never silently regress when we swap
-  providers or models
-- Implemented full request observability: per-request trace of prompts,
-  retrievals, model calls, latency, and token cost
-- Led prompt engineering across [REQUIRES INPUT: N] distinct use cases,
-  codified into reusable templates with versioning
-- [REQUIRES INPUT: optional — cross-functional ownership: did you also
-  own product, stakeholders, rollout, mentoring?]
+- **Designing solutions**: General-purpose agents, Model Context
+  Protocol (MCP) tools, Azure use cases with a strong data-platform
+  focus. Each solution targets a specific business workflow that a
+  department already does manually.
+- **End-to-end ownership**: From requirements gathering with the
+  business stakeholder to deployment, observability, and handover.
+- **Cloud architecture**: Building secure enterprise-grade
+  architectures on Azure — auth, data residency, network isolation,
+  audit logs, cost monitoring.
+- **Fast iteration**: Ship a working prototype, get the business team
+  using it, iterate in short cycles with real users instead of long
+  upfront specs.
 
-## Architecture
+## Tech stack
 
-Standard RAG-with-routing topology, generic enough to share:
+- **LLM providers**: OpenAI (direct) and Azure OpenAI through Azure
+  AI Foundry
+- **Frameworks**: LangChain for orchestration on some workloads; the
+  OpenAI **Agents SDK** for tool-using agent flows
+- **Retrieval**: Azure AI Search (hybrid dense + keyword), OpenAI
+  Vector Store for prototype workloads
+- **Tool integration**: Model Context Protocol (MCP) for exposing
+  internal tools to agents
+- **Cloud**: Azure (primary) with some workloads touching GCP
+- **Languages**: Python end-to-end
 
-```
-User query
-  └─> Auth layer (SSO)
-       └─> Query router (intent classification → specialized pipeline)
-            └─> Retrieval (embedding search + keyword fallback + rerank)
-                 └─> Context assembly with citation metadata
-                      └─> LLM call (with provider failover)
-                           └─> Post-processing (citation injection,
-                               PII scrub, response validation)
-                                └─> Observability sink + response
-```
+## Patterns I&apos;ve repeated across use cases
 
-## Key decisions
+### Agents as the default interface
 
-### RAG over fine-tuning
+Instead of one monolithic chat app, each solution is a focused agent
+with a specific scope, a curated toolset, and a clear handoff to a
+human. The Agents SDK pattern (instructions + tools + guardrails)
+ships faster than custom orchestration and survives provider upgrades
+better.
 
-Domain knowledge changes weekly — fine-tuning would have meant rebuilding
-the model on every refresh. Retrieval keeps the model frozen and the index
-mutable, which is the right axis to vary for a knowledge product. The
-tradeoff is more compute per query and a more complex retrieval pipeline,
-which we paid for with the observability investment.
+### MCP for internal tool exposure
 
-### Multi-LLM routing from day one
+When the agent needs to read or write into an internal system, MCP is
+the standard. It lets the same tool definition work across providers,
+keeps tool definitions version-controlled, and makes the surface area
+the security team has to review explicit.
 
-Most prototypes start with one provider. We didn't, because:
-- **Failover**: provider outages are inevitable; degrading to a backup is
-  better than going dark
-- **Cost shaping**: simple queries route to a cheaper tier, complex ones
-  to a stronger model
-- **Regulatory optionality**: different providers have different data
-  residency stories; the routing layer is where that conversation
-  happens
+### Hybrid retrieval over pure vector search
 
-### Evaluation harness before optimization
+Azure AI Search&apos;s hybrid mode (dense + sparse + reranking) beats
+pure embedding search on enterprise content, especially documents
+with structured headers, codes, and proper nouns. The eval numbers
+that justified this are NDA, but the qualitative finding is widely
+reproducible.
 
-We built a golden-dataset eval harness before we touched retrieval
-parameters. Without it, every "improvement" was someone's vibe. With it,
-the loop became: change one thing → measure on the harness → keep or
-revert. This is the single most leveraged piece of infrastructure on the
-project.
+### Iteration with the business, not for the business
 
-## Metrics
+The fastest path from "we have an idea" to "we use this every day"
+is to put a rough version in front of the real user within one or two
+weeks. Long specs miss the way the actual workflow differs from how
+it is described in meetings.
 
-[REQUIRES INPUT: relative metrics only, your choice on what to share.
-Examples: "Reduced [generic task] from N hours to N minutes",
-"Cost per query reduced by X% after [optimization]",
-"Eval accuracy improved from X to Y on internal golden set".
-If everything is hard-NDA, one strong qualitative sentence works.]
+## Scale and impact (sanitized)
+
+I have led **5+ distinct use cases** across the company. Several have
+moved from prototype to "the default tool that team reaches for"
+within months — replacing manual processes that previously involved
+spreadsheets, internal portals, and email chains. Specific absolute
+metrics are NDA.
+
+## What this year has taught me
+
+- How to operate in an **enterprise environment**: security review,
+  procurement, data-classification handling, change management
+- How to **recognize a real business use case** versus a demo:
+  workflows that are repeated weekly by multiple people are gold;
+  one-off curiosity is not
+- How to assemble **end-to-end secure cloud architectures** on Azure
+  rather than just calling APIs from a notebook
+- How to **iterate fast** under constraints that startups do not
+  have — and to ship anyway
 
 ## What I&apos;d do differently
 
-[REQUIRES INPUT: one honest reflection. Suggested angles: started with
-a framework when a thin custom orchestrator would have been easier to
-debug; chose a vector DB based on hype rather than fit; under-invested
-in observability early; over-invested in prompt engineering before
-evaluation existed.]
+I started with LangChain on workloads where the OpenAI Agents SDK
+(once it landed) would have been the better default. The agent
+abstraction maps more cleanly to enterprise use cases, where each
+solution is one focused capability and not a generic chatbot. I have
+ported some of the early work and would now reach for Agents SDK
+first by default.
+
+## Why this role for an AI engineer
+
+A non-tech Fortune 500 turns out to be a strong first job for an AI
+engineer. The bar for adoption is not technical novelty, it is
+"does this become the thing the user reaches for". You learn what AI
+costs to operate, what enterprise procurement actually looks like,
+how to talk to a non-technical stakeholder about what the model can
+and cannot do. None of these are taught in startup blog posts.

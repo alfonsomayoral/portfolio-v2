@@ -1,8 +1,8 @@
 ---
 title: RGB-D Nutritional Pipeline (TFG)
-tagline: Research-grade portion estimation fusing iPhone LiDAR with multimodal reasoning
-description: Undergraduate thesis at UC3M, an advanced RGB-D pipeline for nutritional tracking that uses the Spotter app as research interface
-tech_stack: [Python, ARKit, LiDAR, GPT-4o, Computer Vision, Research]
+tagline: Single-scan portion estimation fusing iPhone LiDAR with multimodal LLMs — undergraduate thesis at UC3M
+description: Research-grade pipeline that fuses LiDAR depth, TSDF reconstruction, and GPT-4o reasoning to estimate food volume and macronutrients from a single iPhone Pro scan
+tech_stack: [Python, ARKit, LiDAR, Open3D, DeepLabV3+, GPT-4o, PyTorch, Computer Vision]
 role: Author
 year: 2026
 status: research
@@ -12,61 +12,124 @@ order: 4
 
 ## Overview
 
-My undergraduate thesis at Universidad Carlos III de Madrid. Where
-[Spotter](/projects/spotter) is the consumer product, the TFG is the
-research artifact behind a more advanced portion-estimation pipeline,
-using the Spotter iOS app as the data-capture and evaluation interface.
+Undergraduate thesis at Universidad Carlos III de Madrid. While
+[Spotter AI](/projects/spotter) is the consumer product, the TFG is a
+distinct research artifact: an RGB-D nutritional pipeline that uses
+the iPhone Pro LiDAR sensor to push portion-volume accuracy closer to
+research-grade, with explicit confidence and a reproducible
+evaluation harness. The two projects are independent — Spotter uses
+pretrained foundation models served through APIs, the TFG trains and
+evaluates custom geometry + multimodal architectures end-to-end on
+public food datasets.
 
-The goal: take the consumer-grade single-scan flow and push portion-volume
-accuracy closer to research-grade, with explicit error bars per scan and
-a reproducible evaluation harness.
+Defense scheduled for **6 July 2026** at UC3M.
 
 ## Research questions
 
 1. How much portion-volume accuracy can a single iPhone LiDAR scan
-   deliver, vs. lab-grade depth setups?
-2. What's the right division of labor between geometric estimation
+   deliver compared to lab-grade depth setups (Kinect, structured
+   light, photogrammetry)?
+2. What is the right division of labor between geometric estimation
    (from depth) and semantic reasoning (from multimodal LLMs)?
-3. Can the system produce calibrated confidence intervals, not just point
-   estimates?
+3. Can the system produce calibrated per-scan confidence intervals on
+   the final macronutrient values, not just point estimates?
 
 ## Method
 
-- Data capture: Spotter app extended with research-mode flags to log raw
-  LiDAR depth, RGB frames, and timestamps
-- Ground-truth dataset: [REQUIRES INPUT: how did you build it — N meals
-  weighed on a calibrated scale + photographed? A public dataset? A mix?]
-- Pipeline: depth-conditioned segmentation + volume estimation, then
-  GPT-4o for identity + per-100g macros lookup
-- Evaluation: per-class portion error, end-to-end macro MAE, calibration
-  curves
+The pipeline takes 36 RGB-D frames captured through ARKit on an
+iPhone Pro and produces structured per-segment macros end-to-end:
 
-## Tech stack
+```
+iOS LiDAR (ARKit) → 36 RGB-D frames + camera poses + intrinsics
+  └─> TSDF reconstruction (Open3D, 5 mm voxel)         [3D geometry]
+       └─> 2D instance segmentation                     [DeepLabV3+ MobileNetV3,
+            (per-frame masks)                            FoodSeg103, 104 classes]
+            └─> Back-projection to 3D point cloud      [per-instance volumes]
+                 └─> Mesh-based volume estimation     [Poisson + divergence
+                      (per segment)                    theorem; voxel fallback]
+                      └─> GPT-4o classification        [name, category, density,
+                           + macros per 100g            macros per 100g]
+                           └─> Fusion                  [weight = volume × density,
+                                                       macros = weight × per_100g]
+```
+
+## Key decisions
+
+### LLM-direct classification over a hand-curated food database
+
+Earlier versions of the pipeline used CLIP ViT-B/32 with LoRA rank=8
+fine-tuned on Nutrition5k (~300 scans), plus a hardcoded density table
+of ~50 food codes. Both were brittle: CLIP confused visually similar
+foods (chicken vs. turkey, white rice vs. couscous), and any food
+outside the table received a generic density of 0.75 g/cm³, causing
+large compounding errors.
+
+The thesis defends a different architecture: GPT-4o handles
+classification, density estimation, and macros-per-100g in a single
+structured-output call. This is justified by the literature
+(DietAI24 in Nature Communications Medicine, ACETADA 2025), where
+LLMs with retrieval over standardized nutrition databases achieve
+state-of-the-art accuracy on calorie estimation.
+
+### Mesh-based volume estimation over voxel counting
+
+The original Spotter pipeline counted occupied surface voxels, which
+the code itself flagged as "a conservative lower bound — interior
+empty voxels are not counted." The thesis replaces this with Poisson
+surface reconstruction followed by volume via the divergence theorem,
+inspired by VolE (Scientific Reports 2026). Voxel counting is kept as
+a fallback for segments with fewer than 50 points.
+
+### iPhone LiDAR over photogrammetry
+
+Multi-angle photogrammetry needs the user to circle the plate, which
+is a UX killer for a consumer-grade workflow. LiDAR gives metric depth
+from a single scan path. The accuracy ceiling is lower than
+structured-light lab setups, but the floor is high enough for the use
+case and the UX is uncompromised.
+
+## Datasets and benchmarks
+
+- **Nutrition5k** (Google, 2021) — 5,006 dishes with RGB-D and verified
+  weights, used for training and evaluation
+- **FoodSeg103** (2021) — 9,490 images across 154 ingredient classes,
+  used to train the 2D segmenter
+- **MetaFood3D** (CVPR 2024 Workshop) — 743 3D objects with mesh + RGB-D
+  + nutrition, used as a 3D volume benchmark
+- **FNDDS / BEDCA** — standardized nutrition databases used for ground
+  truth on macros per 100 g
+
+## Stack
 
 - iPhone Pro (LiDAR-capable) as the capture device
-- Spotter app (Swift + ARKit) as the research front-end
-- Python + [REQUIRES INPUT: PyTorch / OpenCV / Open3D — which libraries]
-  for the offline analysis pipeline
-- OpenAI GPT-4o for the semantic step
-- [REQUIRES INPUT: any framework you used for reproducibility — wandb,
-  hydra, dvc, plain make]
+- Spotter mobile app extended with research-mode flags for raw frame
+  capture
+- Python backend service: Open3D for 3D reconstruction, PyTorch for
+  the segmentation model, OpenAI Python SDK for the GPT-4o calls
+- FastAPI for the analysis service
+- Docker for reproducible deployment
 
 ## Key results
 
-[REQUIRES INPUT: 2-3 quantitative findings — e.g., "Mean portion-volume
-error reduced from X% to Y% vs. baseline", "Calibration improved from
-overconfident to nearly-calibrated across N food classes", "Pipeline
-runs at N seconds end-to-end on a modern laptop". Be specific where
-possible; if results are not yet final, say so and frame as in-progress.]
+Results are being finalized for the defense in July 2026. The thesis
+documents:
+- A side-by-side error comparison between voxel-counting and
+  mesh-based volume estimation on MetaFood3D
+- An ablation of the LLM-direct classification step versus
+  CLIP+LoRA+catalog on Nutrition5k
+- An end-to-end evaluation of macro mean absolute error on a held-out
+  set, with per-class breakdowns and calibration analysis
 
 ## What I&apos;d do differently
 
-[REQUIRES INPUT: one honest reflection on the research process — what
-you'd scope differently, what you under/over-invested in, what surprised
-you.]
+I would have committed to the final architecture earlier. The first
+iterations chained CLIP+LoRA+hardcoded-density-tables together
+because each component was incrementally easier; the LLM-direct
+architecture is dramatically simpler and required throwing away two
+months of work to adopt. Picking the right architecture is worth more
+than iterating on the wrong one.
 
 ## Links
 
-- Thesis memoria (PDF): [REQUIRES INPUT: link to the PDF when defended]
-- Related consumer product: [Spotter](/projects/spotter)
-- Defense slides: [REQUIRES INPUT: link or "available on request"]
+- Defense: 6 July 2026, UC3M
+- Related consumer product: [Spotter AI](/projects/spotter)

@@ -1,9 +1,9 @@
 ---
 title: BearHack — Bad Posture Detection
-tagline: 3rd place at UC Riverside Hackathon, real-time posture monitoring with computer vision
-description: A real-time webcam-based posture monitoring system built in 24 hours at the UC Riverside hackathon
-tech_stack: [Python, OpenCV, Computer Vision, Hackathon]
-role: Team member (CV pipeline)
+tagline: 3rd place at UC Riverside Hackathon — real-time posture monitoring with computer vision and an Arduino feedback device
+description: A 24-hour hackathon project at UC Riverside combining MediaPipe pose estimation with a hardware alert system. 3rd place out of 40+ teams in a 150+ person hackathon.
+tech_stack: [Python, MediaPipe, Computer Vision, Arduino, Hackathon]
+role: Team member — CV pipeline + integration
 year: 2024
 status: archived
 featured: false
@@ -12,31 +12,35 @@ order: 5
 
 ## Overview
 
-A 24-hour hackathon project at UC Riverside during my exchange year.
-Real-time webcam posture monitoring that alerts the user when they slouch,
-hunch, or lean too far forward for too long.
+Built in 24 hours at the UC Riverside hackathon during my exchange
+year (2024-25). Real-time webcam posture monitoring that alerts the
+user through a small Arduino-based device when they slouch for too
+long.
 
-Won **3rd place** out of [REQUIRES INPUT: N] teams.
+Won **3rd place** out of **40+ teams** in a hackathon with **150+
+participants**.
 
 ## My role
 
-Owned the computer vision pipeline:
-[REQUIRES INPUT: brief detail — pose estimation backbone used, the
-slouching-detection heuristic, the alerting logic]
+Owned the computer vision pipeline: real-time pose estimation with
+MediaPipe, processing the webcam feed to detect shoulder and neck
+angles, and the integration between the Python detection process and
+the Arduino feedback device over serial.
 
 ## Tech stack
 
 - Python
+- MediaPipe for pose estimation
 - OpenCV for camera capture and preprocessing
-- [REQUIRES INPUT: pose backbone — MediaPipe, OpenPose, MoveNet?]
-- [REQUIRES INPUT: how was alerting delivered — desktop notification,
-  audio, web overlay?]
+- Arduino with custom firmware for the feedback hardware
+- Serial communication between Python and Arduino
 
 ## What I learned
 
-Hackathon scope discipline: we initially scoped a 4-feature product and
-nearly shipped nothing. Cutting back to one feature with one excellent
-demo path is what got us on the podium.
+Hackathon scope discipline. We initially scoped a four-feature
+product and nearly shipped nothing. Cutting back to one feature with
+one excellent end-to-end demo — webcam to wrist alert — is what got
+us on the podium.
 
 ## Links
 

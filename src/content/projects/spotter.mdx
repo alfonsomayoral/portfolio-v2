@@ -1,112 +1,146 @@
 ---
-title: Spotter
-tagline: Camera-first nutritional tracking on iOS, powered by LiDAR and multimodal LLMs
-description: Consumer iOS app that turns the iPhone Pro LiDAR sensor and GPT-4o into a single-scan food coach
-tech_stack: [Swift, SwiftUI, ARKit, Core ML, GPT-4o, iOS]
-role: Founder & sole engineer
-year: 2025
+title: Spotter AI
+tagline: A camera-first fitness companion that sees your gym sessions, understands your meals, and grows with your community
+description: Cross-platform iOS and Android app on the App Store. Four pillars in one product — nutrition, workout, social, and gamification — powered by GPT-4o vision and a production Supabase stack.
+tech_stack: [React Native, Expo, TypeScript, Supabase, GPT-4o, RevenueCat, Remotion]
+role: Founder & engineering lead
+year: 2026
 status: shipped
 featured: true
 order: 1
+links:
+  appstore: https://apps.apple.com/us/app/spotter-ai/id6756170372
 ---
 
 ## Overview
 
-Manual food logging is the dominant failure mode of nutrition apps —
-friction kills adherence within weeks. Existing computer-vision approaches
-guess portions from 2D photos and fail on volume estimation. Since 2020,
-every iPhone Pro ships with a LiDAR sensor that nobody had productized for
-consumer nutrition.
+Spotter AI is the fitness app I wished existed. Development started in
+June 2025 and we shipped to the App Store in February 2026. It runs on
+iOS and Android, and it bundles four products that other apps usually
+sell separately:
 
-Spotter is the app I wished existed: point your iPhone at a plate, get
-back portion-accurate macros without typing, searching, or scanning
-barcodes. The scan flow takes under three seconds.
+1. **Nutrition with AI.** Take a photo of your plate and get back macros
+   (calories, protein, carbs, fat) in seconds. GPT-4o Vision does the
+   identification and portion reasoning. Barcode scanner with
+   OpenFoodFacts for packaged foods. Health score 0-10 per item.
+2. **Workout.** Live gym sessions with sets, reps, weight, and RPE.
+   Brzycki 1RM tracking, 500+ exercise library with videos, cardio,
+   rest timer that works in background. Coach-student relationships
+   for Premium users.
+3. **Social.** A feed for sharing completed workouts and meals. Likes,
+   comments, follows, public routines. Workout summaries auto-render as
+   shareable videos through Remotion.
+4. **Streaks and gamification.** 60+ achievement badges, weekly
+   challenges, XP-based leagues, daily streaks with a frozen-day grace
+   period, a bear mascot called Spotty.
 
-This case study covers the consumer product. The underlying portion-volume
-research is documented separately in my
-[undergraduate thesis case study](/projects/tfg).
+Spotter and the [RGB-D nutritional pipeline of my undergraduate
+thesis](/projects/tfg) are independent projects. Spotter uses pretrained
+foundation models (GPT-4o, trained on huge food and nutrition data)
+served via API. The TFG is the academic research line — custom
+architectures with iPhone LiDAR depth, mesh-based volume estimation,
+and end-to-end evaluation.
 
 ## My role
 
-Solo founder and engineer. I shipped every part of the product:
+Founder and engineering lead. Two collaborators contributed to parts of
+the build; I led the engineering team and wrote most of the code. I
+owned:
 
-- Designed the RGB-D scan pipeline that fuses LiDAR depth with multimodal
-  LLM reasoning
-- Built the on-device classification stack in Core ML so the camera flow
-  stays responsive offline up to the cloud reasoning step
-- Shipped the full iOS surface area: onboarding, scan flow, history,
-  paywall, profile
-- Built the backend that aggregates scan metadata and calls GPT-4o
-- Owned design, product decisions, and the App Store submission process
+- Product direction across all four pillars
+- The full mobile stack (Expo, React Native, Expo Router, TypeScript,
+  Zustand, design system, 167 components, 20 stores)
+- The backend (Supabase: Postgres schema, RLS policies, 15 edge
+  functions, real-time channels, storage)
+- AI integration (GPT-4o food analysis, barcode AI clarification,
+  health scoring)
+- Monetization (RevenueCat across free / Pro / Premium tiers)
+- App Store and Play Store submission and review cycles
 
 ## Tech stack
 
-- **iOS**: Swift, SwiftUI, ARKit (LiDAR depth + scene reconstruction),
-  Core ML, Vision
-- **Backend**: [REQUIRES INPUT: backend stack — e.g., FastAPI + Postgres,
-  Firebase, Supabase]
-- **AI**: OpenAI GPT-4o (multimodal reasoning), Core ML on-device food
-  classifier
-- **Payments**: [REQUIRES INPUT: RevenueCat / StoreKit / none yet]
-- **Analytics**: [REQUIRES INPUT: PostHog / Mixpanel / none yet]
+- **Mobile**: React Native 0.81, Expo SDK 54, Expo Router (file-based),
+  TypeScript strict, Zustand state, React Native Reanimated, i18next
+  (English and Spanish)
+- **Backend**: Supabase (PostgreSQL, Auth, Storage, Edge Functions on
+  Deno, Realtime channels) with row-level security on every table
+- **AI**: OpenAI GPT-4o for vision analysis of food, GPT-4o-mini for
+  barcode clarification, OpenFoodFacts for product metadata
+- **Monetization**: RevenueCat (StoreKit-side integration), three tiers
+- **Video**: Remotion server-side for workout summary videos shareable
+  to Instagram Stories
+- **Build and submit**: EAS Build for cloud iOS and Android builds
 
 ## Architecture
 
 ```
-iPhone camera + LiDAR
-  └─> ARKit depth + frame capture
-       └─> Core ML food classifier (on-device, <100ms)
-            └─> Backend aggregates scan metadata
-                 └─> GPT-4o multimodal call
-                      (image + class hypothesis + LiDAR-derived volume)
-                       └─> Structured macros returned
-                            └─> Local persistence + history view
+Mobile (Expo + React Native, iOS + Android)
+  └─> Supabase Edge Functions (Deno)
+       ├─> analyze-food-v2     -> GPT-4o vision -> macros + health score
+       ├─> analyze-barcode     -> OpenFoodFacts + GPT-4o-mini
+       ├─> nutrition-service   -> macro lookup and normalization
+       ├─> create-video-summary -> Remotion -> shareable video
+       ├─> sync-subscription   -> RevenueCat webhook handler
+       └─> 10 more functions   -> notifications, moderation, account ops
+  └─> Supabase Postgres (RLS per table) + Storage + Realtime
+  └─> RevenueCat (paywall, entitlements, trials)
 ```
 
-The key insight: the LLM doesn't have to estimate volume — LiDAR already
-did. The LLM only has to reason about food identity and the
-macronutrient profile of a known portion. This narrows the failure surface
-and produces a much more reliable output than a vision-only pipeline.
+The mobile app is the only client. Every external service goes through
+an edge function so the client never holds third-party secrets.
 
 ## Key decisions
 
-### On-device classification before the LLM call
+### Foundation models over training our own
 
-I considered sending raw frames straight to GPT-4o, but ran the math on
-latency and cost. A Core ML classifier identifies likely candidates in
-under 100ms locally, and the LLM only has to validate and refine. This
-keeps the scan UI snappy and cuts API costs by routing obvious cases
-without a full reasoning call.
+Spotter does not train any vision model. GPT-4o is pretrained on a
+nutrition and food corpus that no startup-sized team can reproduce,
+and the cost per scan is a fraction of the engineering cost of getting
+to comparable accuracy in-house. Where I needed to optimize cost, I
+added cheaper paths (barcode lookup, manual entry with AI
+normalization) rather than swapping the vision model.
 
-### LiDAR depth as the volume signal, not photogrammetry
+### Supabase as the entire backend
 
-Photogrammetry requires multi-angle capture, which is a UX killer. LiDAR
-gives metric depth from a single frame. The portion-estimate quality
-ceiling is lower than a Kinect-style 3D scan, but the floor is high
-enough for the actual use case (a casual user logging a meal in seconds),
-and the UX is uncompromised.
+Auth, Postgres, Storage, edge functions, real-time channels, all from
+one provider. The alternative was four or five services stitched
+together. The cost of operating Spotter at our current scale on
+Supabase is in the tens of dollars per month, and the developer
+ergonomics let one person own the whole backend.
 
-### GPT-4o over a fine-tuned vision model
+### Cross-platform from day one
 
-A fine-tuned vision model is a longer path with worse generalization out
-of the gate. GPT-4o handles long-tail foods (mixed dishes, regional foods,
-homemade meals) without per-food training data. The tradeoff is per-scan
-cost; the mitigation is the on-device classifier filtering trivial cases.
+Expo + React Native shipped iOS and Android simultaneously instead of
+the "iOS first, Android later" path most consumer apps take. Same
+codebase, same release cycle, same feature parity. EAS Build handles
+the native compilation in the cloud.
+
+### Four pillars in one product, not four products
+
+Most competitors do one thing — MyFitnessPal for nutrition, Strong for
+workouts, Strava for the social layer. Spotter bundles them with a
+shared identity, shared streaks, and a single feed. The product hook
+is "your gym AND your meals AND your friends, in one place."
 
 ## Metrics
 
-[REQUIRES INPUT: any of — total downloads, MAU, retention day-7/day-30,
-App Store rating + review count, average scans per user. Pick what you're
-willing to share, omit the rest.]
+- **1,000+ downloads** in the first weeks on the App Store
+- **350+ weekly active users**
+- **Available on iOS and Android** in both Spanish and English
+- **15 production edge functions** powering the backend
+- **3-tier subscription** (Free, Pro, Premium) with a 7-day Pro trial
+  on Pro features (advanced AI, LiDAR scan, extended analytics) and
+  Premium adding coaching
 
 ## What I&apos;d do differently
 
-[REQUIRES INPUT: one honest reflection — e.g., scope mistakes, a feature
-you built and users didn't use, a tech choice you'd reverse, an
-underestimated cost. One paragraph, no hedging.]
+I would have shipped an MVP v0.1 to production before chasing a v1.0
+that felt complete. The version we launched in February could have
+gone out in October with one pillar (nutrition) and grown from there.
+The instinct to ship something polished cost us four months of
+real-user feedback that no internal review can substitute.
 
 ## Links
 
-- App Store: [REQUIRES INPUT: paste URL]
-- Showcase repo: [github.com/alfonsomayoral/spotter-showcase](https://github.com/alfonsomayoral/spotter-showcase) (Phase 4)
-- Related: [the underlying RGB-D research (TFG)](/projects/tfg)
+- App Store: [apps.apple.com/spotter-ai](https://apps.apple.com/us/app/spotter-ai/id6756170372)
+- Related research: [TFG — RGB-D Nutritional Pipeline](/projects/tfg)

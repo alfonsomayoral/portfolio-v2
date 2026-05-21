@@ -1,78 +1,101 @@
 ---
-title: What I learned shipping an iOS app in college
-description: Spotter is on the App Store. Here is what surprised me about LiDAR, multimodal LLMs, and shipping consumer software as a solo founder while studying telecoms.
+title: What I learned shipping Spotter AI to the App Store
+description: Spotter AI launched in February 2026 after eight months of development. Four pillars in one app, two collaborators, fifteen-plus App Store rejections, and a long list of things I wish I had done differently.
 pub_date: 2026-05-15
-tags: [iOS, LLMs, computer-vision, founding]
+tags: [iOS, Android, LLMs, founding]
 reading_time: 7
-draft: true
+draft: false
 ---
 
-> TL;DR — LiDAR makes consumer 3D vision practical in ways nobody is
-> using yet. Multimodal LLMs are unreasonably good at the long tail of
-> visual recognition, but they will eat your margin if you do not gate
-> them. Shipping a real iOS app is 30% engineering and 70% the parts
-> nobody writes blog posts about.
+> TL;DR — Four products in one app is harder than four separate
+> apps. Pretrained foundation models save you a year of engineering
+> if you use them right. App Store rejections are a process, not an
+> emergency. Ship v0.1 to production, not v1.0.
 
-## Why Spotter exists
+## What Spotter AI is
 
-Every nutrition app on the App Store fails at the same thing: friction.
-Logging a meal takes too long, the database is incomplete, and the
-results are barely better than guessing. Adherence dies within weeks.
-Mine did, twice.
+[Spotter AI](/projects/spotter) is a fitness companion on iOS and
+Android. Development started in June 2025. We launched in February
+2026. The app bundles four products that most competitors sell
+separately:
 
-In parallel, every iPhone Pro since 2020 ships with a LiDAR sensor that
-almost nobody uses. The geometric information needed to estimate portion
-volume from a photo has been sitting in everyone&apos;s pocket for years. I
-wanted to know if the consumer UX could finally catch up to the hardware.
+1. **Nutrition** — photo a plate, get macros back from GPT-4o
+2. **Workout** — live gym tracking with sets, reps, weight, RPE, 1RM
+3. **Social** — feed of workouts and meals from people you follow
+4. **Streaks and gamification** — 60+ achievements, weekly leagues, XP
 
-[Spotter](/projects/spotter) is the answer I built. Point the camera at
-a plate, get back macros in under three seconds. No typing, no searching,
-no barcode scanning.
+Built with Expo + React Native + Supabase + GPT-4o + RevenueCat. One
+codebase, two stores, two languages. I led engineering and wrote most
+of the code; two collaborators contributed to parts of the build.
 
-## The architecture is the product
+## What surprised me
 
-The interesting decision is the division of labor between
-**on-device classification**, **LiDAR-derived volume**, and the
-**multimodal LLM**.
+**The model is the easy part.** I came in expecting to optimize
+prompts, retrieval, and food classification. GPT-4o handles 95% of
+the food-analysis problem out of the box. The hard work is the
+**other** 95% of the product: the rest timer that has to keep running
+when the user&apos;s phone is locked, the streak that has to roll over at
+midnight in the user&apos;s local timezone, the feed that has to scroll
+at 60fps with images that haven&apos;t loaded yet.
 
-[REQUIRES INPUT: tighten this section with the exact split — what
-percentage of scans never call the LLM because Core ML is confident
-enough, what the median end-to-end latency is, anything specific about
-where the model gets it wrong.]
+**Foundation models save you a year.** Spotter does not train any
+custom vision model. GPT-4o is pretrained on a food-recognition
+corpus that no team of three could reproduce in a year, and the cost
+per call is a fraction of the engineering cost of getting to
+comparable accuracy. Where we needed to optimize cost, we added
+cheaper paths (barcode lookup, manual entry with AI normalization)
+rather than swapping the model.
 
-The architectural insight: the LLM doesn&apos;t need to estimate volume.
-LiDAR already did. The LLM only has to reason about food identity and
-the macronutrient profile of a known portion. This narrows the failure
-surface dramatically.
+**Four products in one app costs more than four separate apps.** Each
+pillar shares stores, screens, and a unified streak/XP system. That
+shared state is the product hook ("your gym AND your meals AND your
+friends in one place") but it doubles the surface area for bugs.
+Every workout that completes has to update both the workout dashboard
+and the social feed and the achievement engine and the XP store. A
+bug in one corner cascades across screens.
 
-## What I underestimated
+## App Store: fifteen rejections deep
 
-**The App Store submission process.** [REQUIRES INPUT: how many
-submission rejections did you get, and what was the most painful one?]
+We got rejected by App Store review **more than fifteen times** before
+launch. None of the rejections were about the app being bad — they
+were about checklists nobody warns you about: privacy manifest fields,
+specific wording in subscription disclosures, screenshot guidelines on
+status-bar consistency, IAP receipt validation edge cases.
 
-**StoreKit, RevenueCat, paywall UX.** Building the camera flow took
-weeks; building a paywall that converts took almost as long. Pricing,
-trial design, copy, screenshots — every one of them affects revenue more
-than the camera model does.
+The lesson: rejections are a process, not an emergency. Each one
+teaches you a checklist item that no blog post mentions. Plan for
+ten cycles, not one.
 
-**Cost per scan.** GPT-4o is not free. On day one, every scan called the
-model. The first month&apos;s bill made me build the Core ML gating layer
-that should have been there from the start. [REQUIRES INPUT: rough cost
-per scan now vs. day-one.]
+## The cost reality
+
+The big cost lines are:
+
+- **OpenAI GPT-4o** — per scan, the dominant variable cost. Mitigated
+  by the on-device classifier (which gates the call when confidence
+  is high enough), the barcode path (which calls OpenFoodFacts and
+  costs zero per scan), and aggressive caching of repeated foods.
+- **Supabase** — predictable monthly cost for Auth, Postgres, Storage,
+  edge function invocations, and bandwidth. At our scale it is in
+  the tens of dollars per month and scales gently with usage.
+
+The unit economics work because Pro and Premium tiers (RevenueCat)
+cover the variable costs for users who scan often, and Free users get
+gated to the cheaper paths.
 
 ## What I&apos;d do differently
 
-[REQUIRES INPUT: one honest reflection. Examples that work: spent
-N weeks on a feature users never used; chose a backend stack I couldn&apos;t
-self-host cheaply; shipped without analytics and was flying blind for
-weeks.]
+**Ship v0.1 to production before chasing v1.0.** The version we
+launched in February could have gone out in October with one pillar
+(nutrition) and grown from there. I optimized for a polished launch
+and lost four months of real-user feedback that no internal review
+can substitute. The next product I build will hit the App Store with
+a single feature and a clear roadmap.
 
 ## For other student builders
 
-The most common failure mode I see in student projects is treating
-shipping as a final step. It is the only step that matters.
-Everything before it is just preparation. Pick a small enough scope that
-you can ship, then ship, then expand.
+If you have been "almost ready to launch" for more than three months:
+launch the worse version. Every week you do not ship is a week of
+feedback you do not get. The polished v1.0 is rarely worth the
+months you spent on it.
 
-If you&apos;re reading this and you have a project you&apos;ve been &quot;almost ready
-to launch&quot; for more than three months: launch the worse version.
+[Spotter AI is live on the App Store.](https://apps.apple.com/us/app/spotter-ai/id6756170372)

@@ -2,103 +2,106 @@
   {
     "id": "aisc-madrid",
     "title": "AISC Madrid",
-    "tagline": "Co-founded Madrid's largest student-run AI community",
-    "description": "First AISC chapter in Europe, first AI student association at UC3M. Talks, workshops, hackathons, mentorship",
+    "tagline": "Co-founded Madrid's largest student-run AI community — first AISC chapter in Europe",
+    "description": "The first AISC chapter outside the US and the first AI student association at UC3M. 500+ community members, 30+ events, partnerships with Microsoft, GitHub, Hugging Face, and Spotify.",
     "tech": [
       "Community",
       "Leadership",
       "Events",
-      "Mentorship",
-      "Ecosystem"
+      "Partnerships"
     ],
     "slug": "/projects/aisc-madrid",
     "year": "2025",
     "position": [
-      0.15225941052187042,
       1,
-      -0.12824371449089655
+      -0.384274027234664,
+      1
     ]
   },
   {
     "id": "bearhack-posture",
     "title": "BearHack — Bad Posture Detection",
-    "tagline": "3rd place at UC Riverside Hackathon, real-time posture monitoring with computer vision",
-    "description": "A real-time webcam-based posture monitoring system built in 24 hours at the UC Riverside hackathon",
+    "tagline": "3rd place at UC Riverside Hackathon — real-time posture monitoring with computer vision and an Arduino feedback device",
+    "description": "A 24-hour hackathon project at UC Riverside combining MediaPipe pose estimation with a hardware alert system. 3rd place out of 40+ teams in a 150+ person hackathon.",
     "tech": [
       "Python",
-      "OpenCV",
+      "MediaPipe",
       "Computer Vision",
+      "Arduino",
       "Hackathon"
     ],
     "slug": "/projects/bearhack-posture",
     "year": "2024",
     "position": [
-      -1,
-      -0.02310607158340472,
-      -0.24967850004613001
+      0.6634536516242067,
+      1,
+      -0.10235327269985228
     ]
   },
   {
     "id": "spotter",
-    "title": "Spotter",
-    "tagline": "Camera-first nutritional tracking on iOS, powered by LiDAR and multimodal LLMs",
-    "description": "Consumer iOS app that turns the iPhone Pro LiDAR sensor and GPT-4o into a single-scan food coach",
+    "title": "Spotter AI",
+    "tagline": "A camera-first fitness companion that sees your gym sessions, understands your meals, and grows with your community",
+    "description": "Cross-platform iOS and Android app on the App Store. Four pillars in one product — nutrition, workout, social, and gamification — powered by GPT-4o vision and a production Supabase stack.",
     "tech": [
-      "Swift",
-      "SwiftUI",
-      "ARKit",
-      "Core ML",
+      "React Native",
+      "Expo",
+      "TypeScript",
+      "Supabase",
       "GPT-4o",
-      "iOS"
+      "RevenueCat",
+      "Remotion"
     ],
     "slug": "/projects/spotter",
-    "year": "2025",
+    "year": "2026",
     "position": [
-      -0.15295324261746857,
-      -1,
-      1
+      0.5820830867047373,
+      -0.22466894985929486,
+      -1
     ]
   },
   {
     "id": "suntory-genai",
-    "title": "Enterprise GenAI Assistant",
-    "tagline": "Production multi-LLM platform at Beam Suntory — sanitized case study",
-    "description": "Internal GenAI assistant at a Fortune 500 beverages company, with retrieval over enterprise knowledge, multi-provider LLM routing, evaluation harness, and observability",
+    "title": "Enterprise GenAI at Beam Suntory",
+    "tagline": "Production AI engineering inside the AI software team at a Fortune 500 — agents, MCPs, and enterprise Azure architectures",
+    "description": "One year as an AI Engineer at Beam Suntory, building end-to-end GenAI solutions across departments. Sanitized case study — patterns and engineering, not product internals.",
     "tech": [
       "Python",
-      "FastAPI",
       "LangChain",
-      "RAG",
-      "LLMs",
-      "Azure"
+      "OpenAI Agents SDK",
+      "Azure AI Foundry",
+      "Azure AI Search",
+      "MCP"
     ],
     "slug": "/projects/suntory-genai",
     "year": "2025",
     "position": [
-      1,
-      -0.1642031351399793,
-      0.279654406979958
+      -0.4664156982779071,
+      -1,
+      0.3290153504676576
     ]
   },
   {
     "id": "tfg",
     "title": "RGB-D Nutritional Pipeline (TFG)",
-    "tagline": "Research-grade portion estimation fusing iPhone LiDAR with multimodal reasoning",
-    "description": "Undergraduate thesis at UC3M, an advanced RGB-D pipeline for nutritional tracking that uses the Spotter app as research interface",
+    "tagline": "Single-scan portion estimation fusing iPhone LiDAR with multimodal LLMs — undergraduate thesis at UC3M",
+    "description": "Research-grade pipeline that fuses LiDAR depth, TSDF reconstruction, and GPT-4o reasoning to estimate food volume and macronutrients from a single iPhone Pro scan",
     "tech": [
       "Python",
       "ARKit",
       "LiDAR",
+      "Open3D",
+      "DeepLabV3+",
       "GPT-4o",
-      "Computer Vision",
-      "Research"
+      "PyTorch",
+      "Computer Vision"
     ],
     "slug": "/projects/tfg",
     "year": "2026",
     "position": [
-      0.12600338398135813,
-      -0.7327329989098247,
-      -1
+      -1,
+      0.2523635502079624,
+      -0.40234492728545845
     ]
   }
 ]
