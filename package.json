@@ -10,7 +10,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "embeddings": "tsx scripts/generate-embeddings.ts",
+    "embeddings": "tsx --env-file-if-exists=.env scripts/generate-embeddings.ts",
     "prebuild": "npm run embeddings"
   },
   "dependencies": {
