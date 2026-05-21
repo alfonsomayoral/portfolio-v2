@@ -1,0 +1,30 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+---
+
+<BaseLayout>
+  <section class="max-w-[var(--container-content)] mx-auto px-6 pt-32 pb-24">
+    <p class="font-mono text-sm text-[var(--color-accent-hover)] mb-6">
+      Phase 1 scaffold — content lands in Phase 3
+    </p>
+    <h1 class="text-5xl md:text-7xl font-semibold tracking-tight text-[var(--color-text-primary)] mb-6">
+      Alfonso Mayoral
+    </h1>
+    <p class="text-xl md:text-2xl text-[var(--color-text-secondary)] max-w-2xl leading-relaxed">
+      AI engineer shipping consumer iOS and enterprise GenAI. Madrid, headed west.
+    </p>
+  </section>
+
+  <section class="max-w-[var(--container-content)] mx-auto px-6 pb-32">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+      <div class="p-6 border border-[var(--color-border)] rounded-lg bg-[var(--color-bg-elevated)]">
+        <p class="font-mono text-[var(--color-text-muted)] text-xs mb-2">STATUS</p>
+        <p class="text-[var(--color-text-primary)]">Astro scaffolded · Tailwind v4 · Lenis · GSAP · three.js</p>
+      </div>
+      <div class="p-6 border border-[var(--color-border)] rounded-lg bg-[var(--color-bg-elevated)]">
+        <p class="font-mono text-[var(--color-text-muted)] text-xs mb-2">NEXT</p>
+        <p class="text-[var(--color-text-primary)]">Phase 2 — embedding visualizer · Phase 3 — content</p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
