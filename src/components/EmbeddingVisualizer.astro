@@ -1,0 +1,328 @@
+---
+/**
+ * 3D embedding visualizer for the landing page.
+ *
+ * Renders each project as a point in 3D space at semantically-derived
+ * coordinates (UMAP of OpenAI embeddings, computed at build time).
+ *
+ * - Hover: scale point, show tooltip
+ * - Click: navigate to project case study
+ * - Drag: free orbit (mouse + touch)
+ * - Wheel: zoom (constrained)
+ * - Idle 5s: resume slow auto-rotation
+ * - Mobile (<768px) or reduced-motion: static fallback
+ */
+---
+
+<section
+  id="embedding-viz"
+  class="relative w-full h-[600px] max-md:h-[420px] my-16 select-none"
+  aria-label="Interactive 3D map of projects"
+>
+  <canvas
+    id="embedding-canvas"
+    class="absolute inset-0 w-full h-full touch-none cursor-grab"
+  ></canvas>
+
+  <div
+    id="embedding-tooltip"
+    class="pointer-events-none absolute z-10 hidden max-w-xs p-3 rounded-md border border-[var(--color-border-strong)] bg-[var(--color-bg-elevated)]/95 backdrop-blur-sm shadow-2xl"
+    role="tooltip"
+  >
+    <p class="font-mono text-xs text-[var(--color-text-muted)] mb-1" data-field="domain"></p>
+    <h4 class="text-sm font-semibold text-[var(--color-text-primary)] mb-1" data-field="title"></h4>
+    <p class="text-xs text-[var(--color-text-secondary)] leading-relaxed mb-2" data-field="tagline"></p>
+    <p class="font-mono text-[10px] text-[var(--color-accent-hover)]" data-field="tech"></p>
+    <p class="font-mono text-[10px] text-[var(--color-text-muted)] mt-2">Click to open case study</p>
+  </div>
+
+  <div
+    id="embedding-fallback"
+    class="absolute inset-0 hidden flex-col items-center justify-center bg-[var(--color-bg-elevated)] border border-[var(--color-border)] rounded-lg p-8 text-center"
+  >
+    <p class="font-mono text-xs text-[var(--color-accent-hover)] mb-3">Interactive on desktop</p>
+    <p class="text-sm text-[var(--color-text-secondary)] max-w-sm">
+      A 3D map of every project, positioned by semantic similarity of its description.
+      Open this page on a larger screen to interact.
+    </p>
+  </div>
+
+  <div class="absolute bottom-3 left-3 font-mono text-[10px] text-[var(--color-text-muted)] pointer-events-none">
+    <span class="opacity-60">drag · hover · click</span>
+  </div>
+</section>
+
+<script>
+  import * as THREE from 'three';
+
+  type Project = {
+    id: string;
+    title: string;
+    tagline: string;
+    description: string;
+    tech: string[];
+    slug: string;
+    domain?: string;
+    position: [number, number, number];
+  };
+
+  const container = document.getElementById('embedding-viz') as HTMLElement | null;
+  const canvas = document.getElementById('embedding-canvas') as HTMLCanvasElement | null;
+  const tooltip = document.getElementById('embedding-tooltip') as HTMLElement | null;
+  const fallback = document.getElementById('embedding-fallback') as HTMLElement | null;
+
+  if (!container || !canvas || !tooltip || !fallback) {
+    throw new Error('EmbeddingVisualizer: required DOM nodes missing');
+  }
+
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (isMobile || prefersReducedMotion) {
+    canvas.classList.add('hidden');
+    fallback.classList.remove('hidden');
+    fallback.classList.add('flex');
+  } else {
+    bootVisualizer();
+  }
+
+  async function bootVisualizer() {
+    let projects: Project[];
+    try {
+      const res = await fetch('/embeddings.json');
+      projects = await res.json();
+    } catch (err) {
+      console.error('EmbeddingVisualizer: failed to load embeddings.json', err);
+      canvas!.classList.add('hidden');
+      fallback!.classList.remove('hidden');
+      fallback!.classList.add('flex');
+      return;
+    }
+
+    if (!projects.length) {
+      console.warn('EmbeddingVisualizer: no projects to render');
+      return;
+    }
+
+    const scene = new THREE.Scene();
+    scene.background = null;
+
+    const aspect = container!.clientWidth / container!.clientHeight;
+    const camera = new THREE.PerspectiveCamera(50, aspect, 0.1, 100);
+    camera.position.set(3, 2, 3);
+    camera.lookAt(0, 0, 0);
+
+    const renderer = new THREE.WebGLRenderer({
+      canvas: canvas!,
+      antialias: true,
+      alpha: true,
+    });
+    renderer.setSize(container!.clientWidth, container!.clientHeight, false);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+    const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    dirLight.position.set(2, 4, 3);
+    scene.add(dirLight);
+
+    // Points: instanced spheres for performance, individually placed
+    const baseGeom = new THREE.SphereGeometry(0.05, 24, 24);
+    const pointMeshes: THREE.Mesh[] = [];
+
+    projects.forEach((p, i) => {
+      const hue = (220 + i * 27) % 360; // indigo-ish base, varied
+      const color = new THREE.Color(`hsl(${hue}, 70%, 65%)`);
+      const mat = new THREE.MeshStandardMaterial({
+        color,
+        emissive: color.clone().multiplyScalar(0.3),
+        roughness: 0.4,
+        metalness: 0.1,
+      });
+      const mesh = new THREE.Mesh(baseGeom, mat);
+      mesh.position.set(...p.position);
+      mesh.userData = p;
+      scene.add(mesh);
+      pointMeshes.push(mesh);
+    });
+
+    // Camera control state
+    const cameraTarget = new THREE.Vector3(0, 0, 0);
+    let azimuth = Math.atan2(camera.position.x, camera.position.z);
+    let polar = Math.acos(camera.position.y / camera.position.length());
+    let radius = camera.position.length();
+    const minRadius = 1.8;
+    const maxRadius = 8;
+
+    function applyCamera() {
+      const sinP = Math.sin(polar);
+      camera.position.set(
+        radius * sinP * Math.sin(azimuth),
+        radius * Math.cos(polar),
+        radius * sinP * Math.cos(azimuth)
+      );
+      camera.lookAt(cameraTarget);
+    }
+    applyCamera();
+
+    // Raycaster for hover
+    const raycaster = new THREE.Raycaster();
+    const ndc = new THREE.Vector2();
+    let hovered: THREE.Mesh | null = null;
+    const originalScales = new WeakMap<THREE.Mesh, number>();
+
+    function setHovered(mesh: THREE.Mesh | null) {
+      if (hovered === mesh) return;
+      if (hovered) {
+        const s = originalScales.get(hovered) ?? 1;
+        hovered.scale.setScalar(s);
+      }
+      hovered = mesh;
+      if (hovered) {
+        originalScales.set(hovered, hovered.scale.x);
+        hovered.scale.setScalar(1.6);
+        canvas!.style.cursor = 'pointer';
+        showTooltip(hovered.userData as Project, hovered.position);
+      } else {
+        canvas!.style.cursor = isDragging ? 'grabbing' : 'grab';
+        hideTooltip();
+      }
+    }
+
+    const tooltipFields = {
+      domain: tooltip!.querySelector('[data-field="domain"]') as HTMLElement,
+      title: tooltip!.querySelector('[data-field="title"]') as HTMLElement,
+      tagline: tooltip!.querySelector('[data-field="tagline"]') as HTMLElement,
+      tech: tooltip!.querySelector('[data-field="tech"]') as HTMLElement,
+    };
+
+    function showTooltip(p: Project, worldPos: THREE.Vector3) {
+      tooltipFields.domain.textContent = (p.domain ?? '').replace(/-/g, ' ').toUpperCase();
+      tooltipFields.title.textContent = p.title;
+      tooltipFields.tagline.textContent = p.tagline;
+      tooltipFields.tech.textContent = p.tech.slice(0, 4).join(' · ');
+      tooltip!.classList.remove('hidden');
+      positionTooltip(worldPos);
+    }
+
+    function hideTooltip() {
+      tooltip!.classList.add('hidden');
+    }
+
+    function positionTooltip(worldPos: THREE.Vector3) {
+      const projected = worldPos.clone().project(camera);
+      const rect = container!.getBoundingClientRect();
+      const x = ((projected.x + 1) / 2) * rect.width;
+      const y = ((-projected.y + 1) / 2) * rect.height;
+      tooltip!.style.left = `${x + 16}px`;
+      tooltip!.style.top = `${y + 16}px`;
+    }
+
+    // Input handling
+    let isDragging = false;
+    let lastX = 0;
+    let lastY = 0;
+    let lastActivity = performance.now();
+    const IDLE_MS = 5000;
+
+    function onPointerDown(e: PointerEvent) {
+      isDragging = true;
+      lastX = e.clientX;
+      lastY = e.clientY;
+      canvas!.setPointerCapture(e.pointerId);
+      canvas!.style.cursor = 'grabbing';
+      lastActivity = performance.now();
+    }
+    function onPointerUp(e: PointerEvent) {
+      isDragging = false;
+      try { canvas!.releasePointerCapture(e.pointerId); } catch {}
+      canvas!.style.cursor = hovered ? 'pointer' : 'grab';
+    }
+    function onPointerMove(e: PointerEvent) {
+      lastActivity = performance.now();
+      const rect = canvas!.getBoundingClientRect();
+      ndc.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      ndc.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+      if (isDragging) {
+        const dx = e.clientX - lastX;
+        const dy = e.clientY - lastY;
+        azimuth -= dx * 0.005;
+        polar = Math.max(0.2, Math.min(Math.PI - 0.2, polar - dy * 0.005));
+        lastX = e.clientX;
+        lastY = e.clientY;
+        applyCamera();
+        hideTooltip();
+      } else {
+        raycaster.setFromCamera(ndc, camera);
+        const hits = raycaster.intersectObjects(pointMeshes, false);
+        setHovered(hits.length ? (hits[0].object as THREE.Mesh) : null);
+        if (hovered) positionTooltip(hovered.position);
+      }
+    }
+    function onWheel(e: WheelEvent) {
+      e.preventDefault();
+      lastActivity = performance.now();
+      const factor = Math.exp(e.deltaY * 0.001);
+      radius = Math.max(minRadius, Math.min(maxRadius, radius * factor));
+      applyCamera();
+    }
+    function onClick() {
+      if (!hovered) return;
+      const p = hovered.userData as Project;
+      window.location.href = p.slug;
+    }
+
+    canvas!.addEventListener('pointerdown', onPointerDown);
+    canvas!.addEventListener('pointerup', onPointerUp);
+    canvas!.addEventListener('pointercancel', onPointerUp);
+    canvas!.addEventListener('pointermove', onPointerMove);
+    canvas!.addEventListener('pointerleave', () => setHovered(null));
+    canvas!.addEventListener('wheel', onWheel, { passive: false });
+    canvas!.addEventListener('click', onClick);
+
+    // Resize
+    function onResize() {
+      const w = container!.clientWidth;
+      const h = container!.clientHeight;
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h, false);
+    }
+    const resizeObserver = new ResizeObserver(onResize);
+    resizeObserver.observe(container!);
+
+    // Visibility: only render when in viewport AND tab visible
+    let inView = true;
+    const intersectObs = new IntersectionObserver(
+      (entries) => {
+        inView = entries[0]?.isIntersecting ?? true;
+      },
+      { threshold: 0.05 }
+    );
+    intersectObs.observe(container!);
+
+    let tabVisible = !document.hidden;
+    document.addEventListener('visibilitychange', () => {
+      tabVisible = !document.hidden;
+    });
+
+    // Animation loop
+    function tick() {
+      requestAnimationFrame(tick);
+      if (!inView || !tabVisible) return;
+
+      const now = performance.now();
+      const idle = now - lastActivity > IDLE_MS;
+      if (idle && !isDragging) {
+        azimuth += 0.0015;
+        applyCamera();
+        if (hovered) positionTooltip(hovered.position);
+      }
+
+      renderer.render(scene, camera);
+    }
+    tick();
+
+    console.log(`EmbeddingVisualizer: rendered ${projects.length} projects`);
+  }
+</script>

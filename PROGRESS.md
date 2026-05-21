@@ -40,11 +40,35 @@ Old portfolio at `../portfolio` is a Jekyll-rendered README using
 
 ---
 
-## Phase 2 — 3D embedding visualizer (NEXT)
+## Phase 2 — 3D embedding visualizer (DONE 2026-05-21)
 
-Per locked decisions: build-time embedding gen with OpenAI fallback to
-mock, three.js point cloud, lazy-loaded, mobile fallback, reduced-motion
-fallback.
+- Build-time embedding generation at `scripts/generate-embeddings.ts`
+  - Reads `src/content/projects/*.mdx` if present, else
+    `scripts/mock-projects.json`
+  - OpenAI `text-embedding-3-small` if `OPENAI_API_KEY` is set; else
+    deterministic sha256-seeded mock vectors with a loud warning
+  - UMAP 1536d -> 3d, normalized to unit cube
+  - Output: `public/embeddings.json`
+  - Wired to `npm run embeddings` and `prebuild` hook
+- Visualizer component at `src/components/EmbeddingVisualizer.astro`
+  - Vanilla three.js, no R3F
+  - Custom orbit controller (azimuth/polar/radius)
+  - Raycaster hover with HTML tooltip overlay synced via `vector.project()`
+  - Click navigates to `project.slug`
+  - 5s idle -> slow Y-axis auto-rotation
+  - Pauses render when off-viewport (IntersectionObserver) or tab hidden
+  - Mobile (<768px) and `prefers-reduced-motion` -> static fallback
+- 5 mock projects seeded: Spotter, TFG, Suntory GenAI, AISC Madrid,
+  BearHack
+- Landing updated to render the visualizer in the second viewport-screen
+- Doc: `docs/EMBEDDING_VISUALIZER.md`
+
+### Verified
+- [x] `npm run embeddings` produces `public/embeddings.json`
+- [x] `npm run build` succeeds, visualizer markup in `dist/index.html`,
+      three.js bundle code-split out of main page chunk
+- [ ] In-browser interaction check (manual — needs Vercel preview or
+      `npm run dev`)
 
 ---
 

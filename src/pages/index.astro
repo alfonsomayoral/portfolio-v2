@@ -1,11 +1,12 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import EmbeddingVisualizer from '@/components/EmbeddingVisualizer.astro';
 ---
 
 <BaseLayout>
-  <section class="max-w-[var(--container-content)] mx-auto px-6 pt-32 pb-24">
+  <section class="max-w-[var(--container-content)] mx-auto px-6 pt-32 pb-12">
     <p class="font-mono text-sm text-[var(--color-accent-hover)] mb-6">
-      Phase 1 scaffold — content lands in Phase 3
+      Available for Fall 2026 — Exponential Fellowship
     </p>
     <h1 class="text-5xl md:text-7xl font-semibold tracking-tight text-[var(--color-text-primary)] mb-6">
       Alfonso Mayoral
@@ -13,18 +14,38 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
     <p class="text-xl md:text-2xl text-[var(--color-text-secondary)] max-w-2xl leading-relaxed">
       AI engineer shipping consumer iOS and enterprise GenAI. Madrid, headed west.
     </p>
+
+    <div class="flex flex-wrap items-center gap-4 mt-10">
+      <a
+        href="/projects"
+        class="inline-flex items-center px-5 py-2.5 rounded-md bg-[var(--color-accent)] text-white font-medium text-sm hover:bg-[var(--color-accent-hover)] transition-colors"
+      >
+        See my work
+      </a>
+      <a
+        href="mailto:alfonsomayoral29@gmail.com"
+        class="inline-flex items-center px-5 py-2.5 rounded-md border border-[var(--color-border-strong)] text-[var(--color-text-primary)] font-medium text-sm hover:bg-[var(--color-bg-elevated)] transition-colors"
+      >
+        Get in touch
+      </a>
+    </div>
+  </section>
+
+  <section class="max-w-[var(--container-content)] mx-auto px-6">
+    <div class="flex items-baseline justify-between mb-2">
+      <h2 class="text-xs font-mono text-[var(--color-text-muted)] uppercase tracking-wider">
+        Project map
+      </h2>
+      <p class="text-xs font-mono text-[var(--color-text-muted)]">
+        positioned by semantic similarity
+      </p>
+    </div>
+    <EmbeddingVisualizer />
   </section>
 
   <section class="max-w-[var(--container-content)] mx-auto px-6 pb-32">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-      <div class="p-6 border border-[var(--color-border)] rounded-lg bg-[var(--color-bg-elevated)]">
-        <p class="font-mono text-[var(--color-text-muted)] text-xs mb-2">STATUS</p>
-        <p class="text-[var(--color-text-primary)]">Astro scaffolded · Tailwind v4 · Lenis · GSAP · three.js</p>
-      </div>
-      <div class="p-6 border border-[var(--color-border)] rounded-lg bg-[var(--color-bg-elevated)]">
-        <p class="font-mono text-[var(--color-text-muted)] text-xs mb-2">NEXT</p>
-        <p class="text-[var(--color-text-primary)]">Phase 2 — embedding visualizer · Phase 3 — content</p>
-      </div>
-    </div>
+    <p class="text-sm text-[var(--color-text-muted)] text-center">
+      Featured projects, About, and Writing land in Phase 3.
+    </p>
   </section>
 </BaseLayout>
