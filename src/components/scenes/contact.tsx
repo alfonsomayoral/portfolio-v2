@@ -2,17 +2,20 @@
 
 import { motion } from 'framer-motion';
 import { Section } from '@/components/ui/section';
+import { HudFrame } from '@/components/hud-frame';
+import { AppearingText } from '@/components/appearing-text';
 import { SocialIcons } from '@/components/social-icons';
 import { PROFILE } from '@/data/profile';
 
 export function ContactScene() {
   return (
-    <Section id="contact" label="06 — Contact" className="pb-20">
-      <div className="relative overflow-hidden rounded-3xl border border-border bg-bg-elevated p-10 md:p-20">
-        <div
-          className="absolute inset-0 spotlight pointer-events-none"
-          aria-hidden="true"
-        />
+    <Section id="contact" label="06 — Contact.signal" className="pb-20">
+      <HudFrame
+        label="//signal.open"
+        meta="ready · listening"
+        className="bg-bg-elevated/80 backdrop-blur-md p-10 md:p-20"
+      >
+        <div className="absolute inset-0 spotlight pointer-events-none" aria-hidden="true" />
 
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -21,15 +24,17 @@ export function ContactScene() {
           transition={{ duration: 0.7 }}
           className="relative text-center max-w-3xl mx-auto"
         >
-          <p className="font-mono text-xs uppercase tracking-widest text-accent mb-6">
+          <p className="font-hud text-xs uppercase tracking-[0.25em] text-accent mb-6">
             Let&apos;s build something
           </p>
 
-          <h2 className="text-4xl md:text-7xl font-black tracking-tight leading-[0.95] mb-8">
-            Building something
-            <br />
-            <span className="text-accent">interesting</span>?
-          </h2>
+          <AppearingText
+            as="h2"
+            className="text-4xl md:text-7xl font-black tracking-tight leading-[0.95] mb-8"
+            stagger={0.05}
+          >
+            Building something interesting?
+          </AppearingText>
 
           <p className="text-base md:text-lg text-fg-secondary leading-relaxed mb-12 max-w-2xl mx-auto">
             Early-stage AI startup, Exponential Fellowship cohort, research
@@ -40,6 +45,7 @@ export function ContactScene() {
           <a
             href={`mailto:${PROFILE.email}`}
             className="inline-block font-mono text-xl md:text-3xl text-fg hover:text-accent transition-colors duration-300 break-all"
+            data-cursor="hover"
           >
             {PROFILE.email}
           </a>
@@ -48,15 +54,14 @@ export function ContactScene() {
             <SocialIcons size="lg" />
           </div>
         </motion.div>
-      </div>
+      </HudFrame>
 
-      <footer className="mt-16 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 font-mono text-xs text-fg-muted">
+      <footer className="mt-16 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 font-hud text-[10px] uppercase tracking-[0.25em] text-fg-muted">
         <div>
           <p>
-            <span className="text-accent">©</span> {new Date().getFullYear()}{' '}
-            Alfonso Mayoral · Madrid
+            <span className="text-accent">©</span> {new Date().getFullYear()} Alfonso Mayoral · Madrid
           </p>
-          <p className="mt-1">
+          <p className="mt-1 opacity-70 normal-case tracking-normal font-mono">
             Built with Next.js, Tailwind, GSAP, and three.js.
           </p>
         </div>
@@ -65,8 +70,9 @@ export function ContactScene() {
           target="_blank"
           rel="noopener noreferrer"
           className="hover:text-fg-secondary transition-colors"
+          data-cursor="hover"
         >
-          Source on GitHub →
+          source.github →
         </a>
       </footer>
     </Section>

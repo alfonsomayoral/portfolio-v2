@@ -20,7 +20,7 @@ export function Section({
       id={id}
       data-scene={id}
       className={cn(
-        'relative w-full px-6 py-24 md:py-32',
+        'relative w-full px-6 py-24 md:py-32 bg-transparent',
         fullHeight && 'min-h-screen flex items-center',
         className
       )}
@@ -28,7 +28,7 @@ export function Section({
     >
       <div className="mx-auto w-full max-w-content">
         {label && (
-          <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-fg-muted mb-6">
+          <p className="font-hud text-[10px] uppercase tracking-[0.25em] text-fg-muted mb-6">
             <span className="text-accent">/</span> {label}
           </p>
         )}

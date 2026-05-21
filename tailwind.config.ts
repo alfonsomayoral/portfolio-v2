@@ -30,6 +30,7 @@ const config: Config = {
       fontFamily: {
         sans: ['var(--font-urbanist)', 'system-ui', 'sans-serif'],
         mono: ['var(--font-jetbrains)', 'ui-monospace', 'monospace'],
+        hud: ['var(--font-space-mono)', 'var(--font-jetbrains)', 'monospace'],
       },
       maxWidth: {
         content: '72rem',
