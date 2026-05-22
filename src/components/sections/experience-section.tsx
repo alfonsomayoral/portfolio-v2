@@ -7,7 +7,7 @@ import { EXPERIENCE } from '@/data/experience';
 
 export function ExperienceSection() {
   return (
-    <SceneSection id="experience" variant="marine" overlay="both">
+    <SceneSection id="experience">
       <div className="flex-1 flex items-start px-6 md:px-12 py-24">
         <div className="mx-auto w-full max-w-6xl">
           <motion.div
@@ -20,7 +20,10 @@ export function ExperienceSection() {
             <p className="font-mono text-[11px] uppercase tracking-[0.3em] text-white/80 mb-6 drop-shadow">
               <span className="text-amber-200">◆</span>&nbsp;&nbsp;Chapter 03 — The journey
             </p>
-            <h2 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight leading-[0.9] text-white mb-6 drop-shadow-2xl">
+            <h2
+              className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight leading-[0.9] text-white mb-6"
+              style={{ textShadow: '0 4px 24px rgba(0,0,0,0.6)' }}
+            >
               Work
               <br />
               experience
@@ -40,7 +43,7 @@ export function ExperienceSection() {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true, margin: '-80px' }}
                 transition={{ duration: 0.7, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
-                className="relative p-7 md:p-8 rounded-md bg-black/45 backdrop-blur-md border border-white/15 hover:border-white/30 transition-colors"
+                className="relative p-7 md:p-8 rounded-md bg-black/50 backdrop-blur-md border border-white/15 hover:border-white/30 transition-colors"
               >
                 <header className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 mb-3">
                   <div className="flex items-center gap-3">
@@ -60,9 +63,7 @@ export function ExperienceSection() {
                   </div>
                 </header>
 
-                <h3 className="text-xl md:text-2xl font-bold text-white mb-1">
-                  {item.role}
-                </h3>
+                <h3 className="text-xl md:text-2xl font-bold text-white mb-1">{item.role}</h3>
                 <p className="text-base md:text-lg text-white/85 mb-4 flex items-center gap-2 flex-wrap">
                   {item.orgUrl ? (
                     <a
