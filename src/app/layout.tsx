@@ -2,8 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Urbanist, JetBrains_Mono, Space_Mono } from 'next/font/google';
 import { Providers } from '@/components/providers';
 import { Cursor } from '@/components/cursor';
-import { NotchBar } from '@/components/notch-bar';
-import { WorkspaceScene } from '@/components/three/workspace-scene';
+import { SectionNav } from '@/components/section-nav';
 import './globals.css';
 
 const urbanist = Urbanist({
@@ -80,13 +79,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={`${urbanist.variable} ${jetbrains.variable} ${spaceMono.variable} dark`}
       suppressHydrationWarning
     >
-      <body className="font-sans antialiased text-fg min-h-screen relative">
+      <body className="font-sans antialiased text-fg min-h-screen relative bg-bg">
         <Providers>
-          <WorkspaceScene />
-          <div className="relative z-10">
-            <NotchBar />
-            {children}
-          </div>
+          <SectionNav />
+          {children}
           <Cursor />
         </Providers>
       </body>

@@ -1,25 +1,17 @@
-import { SceneDock } from '@/components/scene-dock';
-import { HeroScene } from '@/components/scenes/hero';
-import { AboutScene } from '@/components/scenes/about';
-import { SkillsScene } from '@/components/scenes/skills';
-import { ExperienceScene } from '@/components/scenes/experience';
-import { ProjectsScene } from '@/components/scenes/projects';
-import { EducationScene } from '@/components/scenes/education';
-import { ContactScene } from '@/components/scenes/contact';
+import { AboutSection } from '@/components/sections/about-section';
+import { ProjectsSection } from '@/components/sections/projects-section';
+import { ExperienceSection } from '@/components/sections/experience-section';
+import { EducationSection } from '@/components/sections/education-section';
+import { ContactSection } from '@/components/sections/contact-section';
 
 export default function Home() {
   return (
-    <>
-      <SceneDock />
-      <main className="relative">
-        <HeroScene />
-        <AboutScene />
-        <SkillsScene />
-        <ExperienceScene />
-        <ProjectsScene />
-        <EducationScene />
-        <ContactScene />
-      </main>
-    </>
+    <main className="relative">
+      <AboutSection />
+      <ProjectsSection />
+      <ExperienceSection />
+      <EducationSection />
+      <ContactSection />
+    </main>
   );
 }
